@@ -16,3 +16,12 @@
     border-radius: 12px; background: #fff8fa;
 }
 .campo-confirmacion input { width: auto; }
+
+.grupo-campo textarea {
+    width: 100%; padding: 14px 16px; border: 1px solid #dfc8cd; border-radius: 12px;
+    outline: none; transition: border-color .2s ease, box-shadow .2s ease; background: #fff; resize: vertical;
+}
+.grupo-campo textarea:focus {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 4px rgba(183, 110, 121, .12);
+}

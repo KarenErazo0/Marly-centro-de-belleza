@@ -1,0 +1,422 @@
+.seccion-reservas {
+    padding: 2rem 0 4rem;
+}
+
+.contenedor-reserva {
+    width: min(1180px, 94%);
+}
+
+.reserva-centro {
+    text-align: center;
+}
+
+.pasos-reserva {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.paso-reserva {
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: #f9e8ed;
+    color: #a56470;
+    font-weight: 600;
+    font-size: .92rem;
+}
+
+.paso-reserva.activo {
+    background: linear-gradient(135deg, #f08bb1, #e9699d);
+    color: #fff;
+}
+
+.paso-reserva.completado {
+    background: #f3d7e1;
+    color: #8c5260;
+}
+
+.contador-servicios {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    padding: 10px 18px;
+    border: 1px solid #f1bfd2;
+    border-radius: 999px;
+    color: #d93f82;
+    font-weight: 700;
+    background: #fff2f7;
+}
+
+.rejilla-servicios-reserva,
+.rejilla-trabajadores,
+.rejilla-citas-registradas {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+.tarjeta-servicio-reserva,
+.tarjeta-trabajador,
+.tarjeta-cita-registrada,
+.tarjeta-reserva-vacia,
+.tarjeta-horario,
+.tarjeta-confirmacion-reserva {
+    background: #fff;
+    border: 1px solid var(--color-borde);
+    border-radius: 24px;
+    box-shadow: var(--sombra-suave);
+}
+
+.tarjeta-servicio-reserva,
+.tarjeta-trabajador {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.tarjeta-servicio-reserva:hover,
+.tarjeta-trabajador:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 35px rgba(183, 110, 121, .14);
+}
+
+.tarjeta-servicio-reserva input,
+.tarjeta-trabajador input,
+.item-hora input,
+.item-fecha input {
+    display: none;
+}
+
+.tarjeta-servicio-reserva.seleccionado,
+.tarjeta-trabajador.seleccionado {
+    border-color: #ef6b9f;
+    box-shadow: 0 18px 40px rgba(239, 107, 159, .18);
+}
+
+.caja-imagen-servicio-reserva,
+.imagen-trabajador {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+}
+
+.caja-imagen-servicio-reserva img,
+.imagen-trabajador img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.contenido-servicio-reserva,
+.contenido-trabajador {
+    padding: 1.4rem;
+    display: grid;
+    gap: .65rem;
+}
+
+.contenido-servicio-reserva h3,
+.contenido-trabajador h3,
+.tarjeta-cita-registrada h3 {
+    margin: 0;
+    color: #e14c8c;
+}
+
+.meta-servicio-reserva {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.boton-seleccion-servicio {
+    margin: 0 1.4rem 1.4rem;
+    padding: 12px 16px;
+    border-radius: 14px;
+    text-align: center;
+    font-weight: 700;
+    background: #f8d2e1;
+    color: #d7397f;
+}
+
+.badge-calificacion {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: #fff;
+    color: #6b4a03;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(0,0,0,.08);
+}
+
+.especialidad {
+    color: #ef5b98;
+    font-weight: 600;
+}
+
+.acciones-reserva-final,
+.acciones-reserva-superior,
+.encabezado-reserva-simple {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.boton-degradado {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 22px;
+    border-radius: 999px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #c79cf7, #ef8bb1);
+    border: none;
+    cursor: pointer;
+}
+
+.resumen-servicios-mini,
+.chips-reserva {
+    display: flex;
+    gap: .6rem;
+    flex-wrap: wrap;
+}
+
+.resumen-servicios-mini {
+    justify-content: center;
+    margin-bottom: 1.6rem;
+}
+
+.chip-servicio {
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #f9d8e6;
+    color: #c43478;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.tarjeta-horario,
+.tarjeta-confirmacion-reserva,
+.tarjeta-reserva-vacia {
+    padding: 1.8rem;
+}
+
+.resumen-agendamiento-top,
+.resumen-cita-previa,
+.resumen-cita-final {
+    padding: 1.2rem 1.3rem;
+    border-radius: 18px;
+    background: #fff4f8;
+    margin-bottom: 1.5rem;
+    display: grid;
+    gap: .8rem;
+}
+
+.grupo-seleccion-horario {
+    margin-bottom: 1.6rem;
+}
+
+.grupo-seleccion-horario h3,
+.resumen-cita-final h3 {
+    margin-bottom: 1rem;
+    color: #ef4e91;
+}
+
+.rejilla-fechas,
+.rejilla-horas {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: .8rem;
+}
+
+.item-fecha-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.item-fecha,
+.item-hora {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .2rem;
+    min-height: 88px;
+    padding: .9rem;
+    border: 1px solid #f0d1de;
+    border-radius: 16px;
+    background: #fff;
+    transition: .2s ease;
+}
+
+.item-hora {
+    min-height: auto;
+    flex-direction: row;
+    padding: 14px 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.item-fecha.seleccionado,
+.item-hora.seleccionado {
+    border-color: #ef6b9f;
+    background: #ffe7f0;
+    color: #db3f85;
+    box-shadow: 0 8px 20px rgba(239, 107, 159, .12);
+}
+
+.dia-semana {
+    font-size: .85rem;
+    color: var(--color-texto-suave);
+}
+
+.mensaje-sin-horas {
+    grid-column: 1 / -1;
+    color: var(--color-texto-suave);
+}
+
+.rejilla-resumen-final {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.rejilla-resumen-final span,
+.fecha-cita-registrada span,
+.estado-cita {
+    color: var(--color-texto-suave);
+    font-size: .92rem;
+}
+
+.rejilla-resumen-final strong,
+.fecha-cita-registrada strong {
+    display: block;
+    color: #34262a;
+}
+
+.tarjeta-cita-registrada {
+    padding: 1.4rem;
+    display: grid;
+    gap: .9rem;
+}
+
+.tarjeta-cita-encabezado {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.estado-cita {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #eef9f0;
+    color: #2d7a45;
+    font-weight: 700;
+    margin-bottom: .5rem;
+}
+
+.tarjeta-reserva-vacia {
+    text-align: center;
+}
+
+.contenedor-confirmacion {
+    width: min(820px, 94%);
+}
+
+@media (max-width: 992px) {
+    .rejilla-servicios-reserva,
+    .rejilla-trabajadores,
+    .rejilla-citas-registradas {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rejilla-fechas,
+    .rejilla-horas {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .rejilla-servicios-reserva,
+    .rejilla-trabajadores,
+    .rejilla-citas-registradas,
+    .rejilla-fechas,
+    .rejilla-horas,
+    .rejilla-resumen-final {
+        grid-template-columns: 1fr;
+    }
+
+    .acciones-reserva-final,
+    .acciones-reserva-superior,
+    .encabezado-reserva-simple {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+
+.bloques-areas-profesionales {
+    display: grid;
+    gap: 2rem;
+}
+
+.bloque-area-profesional {
+    display: grid;
+    gap: 1.2rem;
+}
+
+.encabezado-area-profesional {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.encabezado-area-profesional h3 {
+    margin: 0 0 .45rem;
+    color: #e14c8c;
+}
+
+.encabezado-area-profesional p {
+    margin: 0;
+    color: var(--color-texto-suave);
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.contador-profesionales-area,
+.resumen-texto-multiple {
+    padding: 10px 14px;
+    border-radius: 16px;
+    background: #fff4f8;
+    border: 1px solid #f1d4df;
+}
+
+.resumen-texto-multiple {
+    display: grid;
+    gap: .2rem;
+}
+
+.resumen-texto-multiple span {
+    color: var(--color-texto-suave);
+    font-size: .92rem;
+}
+
+.chips-profesionales {
+    margin-top: .6rem;
+}

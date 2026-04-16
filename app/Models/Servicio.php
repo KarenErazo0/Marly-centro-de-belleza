@@ -25,8 +25,15 @@ class Servicio extends Model
 
     public $timestamps = false;
 
+
+    public function trabajadores(): BelongsToMany
+    {
+        return $this->belongsToMany(Trabajador::class, 'trabajador_servicio', 'id_servicio', 'id_trabajador');
+    }
+
     public function citas(): BelongsToMany
     {
         return $this->belongsToMany(Cita::class, 'cita_servicio', 'id_servicio', 'id_cita');
     }
 }
+

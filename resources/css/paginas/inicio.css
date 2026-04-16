@@ -44,3 +44,78 @@
     .rejilla-hero, .rejilla-servicios, .rejilla-informacion { grid-template-columns: 1fr; }
     .caja-imagen-servicio { height: 240px; }
 }
+
+
+.barra-reserva-servicios {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+}
+
+.rejilla-servicios-home {
+    align-items: stretch;
+}
+
+.tarjeta-servicio-home {
+    position: relative;
+    cursor: pointer;
+}
+
+.tarjeta-servicio-home.seleccionado {
+    border-color: #ef6b9f;
+    box-shadow: 0 18px 40px rgba(239, 107, 159, .18);
+}
+
+.input-servicio-home {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.marca-seleccion-servicio {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ef5b98;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    box-shadow: 0 10px 20px rgba(239, 91, 152, .24);
+    opacity: 0;
+    transform: scale(.85);
+    transition: .25s ease;
+    z-index: 2;
+}
+
+.tarjeta-servicio-home.seleccionado .marca-seleccion-servicio {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.boton-servicio-home {
+    width: 100%;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.acciones-home-reserva {
+    display: flex;
+    justify-content: center;
+    margin-top: 28px;
+}
+
+@media (max-width: 992px) {
+    .barra-reserva-servicios {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

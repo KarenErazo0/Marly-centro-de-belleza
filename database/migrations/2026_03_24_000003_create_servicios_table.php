@@ -15,6 +15,7 @@ return new class extends Migration
             $table->decimal('precio', 10, 2);
             $table->integer('duracion_minutos');
             $table->enum('estado', ['activo', 'inactivo'])->default('activo');
+            $table->string('imagen')->nullable();
         });
     }
 

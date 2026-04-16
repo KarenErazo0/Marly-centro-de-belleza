@@ -14,6 +14,9 @@ class InicioController extends Controller
             ->orderBy('nombre_servicio')
             ->get();
 
-        return view('inicio.index', compact('servicios'));
+        return view('inicio.index', [
+            'servicios' => $servicios,
+            'reserva' => session('reserva_cita', []),
+        ]);
     }
 }

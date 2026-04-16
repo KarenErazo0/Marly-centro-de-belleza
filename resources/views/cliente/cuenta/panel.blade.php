@@ -8,7 +8,12 @@
         <div class="tarjeta-cuenta bienvenida-cuenta">
             <span class="etiqueta">Panel del cliente</span>
             <h1>Hola, {{ $cliente->nombre_completo }}</h1>
-            <p>Desde aquí puedes actualizar tus datos, cambiar tu contraseña, eliminar tu cuenta o cerrar sesión.</p>
+            <p>Desde aquí puedes actualizar tus datos, gestionar tus citas, cambiar tu contraseña, eliminar tu cuenta o cerrar sesión.</p>
+
+            <div class="acciones-formulario">
+                <a href="{{ route('cliente.citas.index') }}" class="boton boton-primario">Ver mis citas</a>
+                <a href="{{ route('cliente.citas.agendar.servicios') }}" class="boton boton-secundario">Agendar nueva cita</a>
+            </div>
 
             <form action="{{ route('cliente.salir') }}" method="POST" class="bloque-sesion">
                 @csrf

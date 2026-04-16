@@ -15,6 +15,9 @@
                 <a href="{{ route('inicio') }}#servicios">Servicios</a>
                 <a href="{{ route('inicio') }}#contacto">Contacto</a>
                 @if(session('cliente_id'))
+                    <a href="{{ route('cliente.citas.index') }}">Mis citas</a>
+                @endif
+                @if(session('cliente_id'))
                     <a href="{{ route('cliente.cuenta') }}">Mi cuenta</a>
                     <form action="{{ route('cliente.salir') }}" method="POST">
                         @csrf
@@ -54,12 +57,12 @@
         <div class="contenedor rejilla-footer">
             <div>
                 <h4>Marly Centro de Belleza</h4>
-                <p>Sprint 1: catálogo público, registro, inicio de sesión y gestión básica de la cuenta del cliente.</p>
+                <p>HU1, HU2 y HU3: catálogo público, cuenta del cliente y agendamiento de citas.</p>
             </div>
             <div>
                 <h4>Horarios</h4>
-                <p>Lunes a viernes: 7:00 a.m. - 8:00 p.m.</p>
-                <p>Sábados y festivos: 8:00 a.m. - 7:00 p.m.</p>
+                <p>Lunes a viernes: 7:00 a.m. - 7:00 p.m.</p>
+                <p>Sábados: 8:00 a.m. - 7:00 p.m.</p>
             </div>
             <div>
                 <h4>Contacto</h4>

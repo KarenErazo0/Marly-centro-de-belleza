@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\Cliente;
 use App\Models\Servicio;
+use App\Models\Trabajador;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -22,6 +24,42 @@ class DatabaseSeeder extends Seeder
 
         foreach ($services as $service) {
             Servicio::updateOrCreate(['nombre_servicio' => $service['nombre_servicio']], $service);
+        }
+
+        $servicios = Servicio::pluck('id_servicio', 'nombre_servicio');
+
+        $trabajadores = [
+            ['nombre_completo' => 'María González', 'especialidad' => 'Especialista en uñas', 'anios_experiencia' => 8, 'total_resenas' => 127, 'calificacion' => 4.9, 'foto' => 'manicure.jpg', 'servicios' => ['Manicure semipermanente', 'Pedicure spa']],
+            ['nombre_completo' => 'Camila Rosero', 'especialidad' => 'Especialista en uñas', 'anios_experiencia' => 6, 'total_resenas' => 96, 'calificacion' => 4.8, 'foto' => 'pedicure.jpg', 'servicios' => ['Manicure semipermanente', 'Pedicure spa']],
+            ['nombre_completo' => 'Juliana Paz', 'especialidad' => 'Técnica de uñas', 'anios_experiencia' => 5, 'total_resenas' => 89, 'calificacion' => 4.7, 'foto' => 'manicure.jpg', 'servicios' => ['Manicure semipermanente', 'Pedicure spa']],
+            ['nombre_completo' => 'Valentina Coral', 'especialidad' => 'Técnica de uñas', 'anios_experiencia' => 7, 'total_resenas' => 104, 'calificacion' => 5.0, 'foto' => 'pedicure.jpg', 'servicios' => ['Manicure semipermanente', 'Pedicure spa']],
+
+            ['nombre_completo' => 'Laura Martínez', 'especialidad' => 'Estilista senior', 'anios_experiencia' => 10, 'total_resenas' => 98, 'calificacion' => 5.0, 'foto' => 'tinte.jpg', 'servicios' => ['Peinado social', 'Tinte completo']],
+            ['nombre_completo' => 'Ana Rodríguez', 'especialidad' => 'Maquillaje profesional', 'anios_experiencia' => 6, 'total_resenas' => 156, 'calificacion' => 4.8, 'foto' => 'maquillaje.jpg', 'servicios' => ['Maquillaje profesional', 'Peinado social']],
+            ['nombre_completo' => 'Carolina López', 'especialidad' => 'Peinados y recogidos', 'anios_experiencia' => 7, 'total_resenas' => 143, 'calificacion' => 4.9, 'foto' => 'peinado.jpg', 'servicios' => ['Peinado social', 'Tinte completo']],
+            ['nombre_completo' => 'Daniela Ruiz', 'especialidad' => 'Colorista', 'anios_experiencia' => 9, 'total_resenas' => 112, 'calificacion' => 4.9, 'foto' => 'tinte.jpg', 'servicios' => ['Tinte completo', 'Peinado social']],
+            ['nombre_completo' => 'Sofía Herrera', 'especialidad' => 'Estilista integral', 'anios_experiencia' => 8, 'total_resenas' => 135, 'calificacion' => 4.9, 'foto' => 'maquillaje.jpg', 'servicios' => ['Peinado social', 'Tinte completo', 'Maquillaje profesional']],
+
+            ['nombre_completo' => 'Paula Insuasti', 'especialidad' => 'Depilación con cera', 'anios_experiencia' => 5, 'total_resenas' => 73, 'calificacion' => 4.8, 'foto' => 'depilacion.jpg', 'servicios' => ['Depilación con cera']],
+            ['nombre_completo' => 'Andrea Benavides', 'especialidad' => 'Especialista en depilación', 'anios_experiencia' => 6, 'total_resenas' => 80, 'calificacion' => 4.9, 'foto' => 'depilacion.jpg', 'servicios' => ['Depilación con cera']],
+        ];
+
+        foreach ($trabajadores as $data) {
+            $serviciosAsignados = $data['servicios'];
+            unset($data['servicios']);
+
+            $trabajador = Trabajador::updateOrCreate(
+                ['nombre_completo' => $data['nombre_completo']],
+                $data + ['estado' => 'activo']
+            );
+
+            $trabajador->servicios()->sync(
+                collect($serviciosAsignados)
+                    ->map(fn ($nombre) => $servicios[$nombre] ?? null)
+                    ->filter()
+                    ->values()
+                    ->all()
+            );
         }
 
         Cliente::updateOrCreate(
