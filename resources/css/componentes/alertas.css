@@ -1,0 +1,4 @@
+.alerta { margin: 20px 0 0; padding: 14px 16px; border-radius: 12px; font-size: .95rem; }
+.alerta-exito { background: var(--color-exito-fondo); color: var(--color-exito); border: 1px solid #bfe8ca; }
+.alerta-error { background: var(--color-error-fondo); color: var(--color-error); border: 1px solid #f2c4c4; }
+.alerta ul { margin: 8px 0 0 18px; padding: 0; }

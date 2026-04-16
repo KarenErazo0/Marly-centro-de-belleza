@@ -1,0 +1,18 @@
+.rejilla-formulario { display: grid; gap: 18px; }
+.grupo-campo { display: grid; gap: 8px; }
+.grupo-campo label { font-weight: 600; color: #4e4145; }
+.grupo-campo input {
+    width: 100%; padding: 14px 16px; border: 1px solid #dfc8cd; border-radius: 12px;
+    outline: none; transition: border-color .2s ease, box-shadow .2s ease; background: #fff;
+}
+.grupo-campo input:focus {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 4px rgba(183, 110, 121, .12);
+}
+.acciones-formulario { margin-top: 10px; display: flex; gap: 12px; flex-wrap: wrap; }
+.campo-confirmacion {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px; border: 1px solid var(--color-borde);
+    border-radius: 12px; background: #fff8fa;
+}
+.campo-confirmacion input { width: auto; }

@@ -1,0 +1,11 @@
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--color-fondo);
+    color: var(--color-texto);
+}
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
+button, input { font: inherit; }

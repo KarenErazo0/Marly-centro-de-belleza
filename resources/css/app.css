@@ -1,0 +1,20 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+}
+
+@import './base/reset.css';
+@import './base/variables.css';
+@import './componentes/layout.css';
+@import './componentes/botones.css';
+@import './componentes/formularios.css';
+@import './componentes/alertas.css';
+@import './paginas/inicio.css';
+@import './paginas/autenticacion.css';
+@import './paginas/cuenta.css';

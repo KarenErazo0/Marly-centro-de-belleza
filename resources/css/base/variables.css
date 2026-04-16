@@ -1,0 +1,18 @@
+:root {
+    --color-primario: #b76e79;
+    --color-primario-oscuro: #995560;
+    --color-fondo: #fffafb;
+    --color-superficie: #ffffff;
+    --color-superficie-suave: #fff4f7;
+    --color-texto: #2f2a2b;
+    --color-texto-suave: #6f6467;
+    --color-borde: #f1d9de;
+    --color-exito: #1f6b36;
+    --color-exito-fondo: #eefbf2;
+    --color-error: #8a2d2d;
+    --color-error-fondo: #fff1f1;
+    --sombra-suave: 0 12px 32px rgba(183, 110, 121, 0.08);
+    --radio-lg: 24px;
+    --radio-md: 16px;
+    --radio-sm: 12px;
+}

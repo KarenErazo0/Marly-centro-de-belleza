@@ -1,0 +1,10 @@
+.seccion-cuenta { padding: 72px 0; }
+.rejilla-cuenta { display: grid; gap: 24px; }
+.tarjeta-cuenta {
+    background: #fff; border: 1px solid var(--color-borde); border-radius: 24px;
+    padding: 30px; box-shadow: var(--sombra-suave);
+}
+.bienvenida-cuenta p, .tarjeta-cuenta p { color: var(--color-texto-suave); line-height: 1.7; }
+.tarjeta-cuenta h1, .tarjeta-cuenta h2 { margin-top: 0; color: #2d2024; }
+.tarjeta-eliminar { border-color: #f0c5cd; background: #fff7f8; }
+.bloque-sesion { margin-top: 22px; }
