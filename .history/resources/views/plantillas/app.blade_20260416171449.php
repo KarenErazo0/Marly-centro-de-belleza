@@ -57,7 +57,7 @@
         <div class="contenedor rejilla-footer">
             <div>
                 <h4>Marly Centro de Belleza</h4>
-                <p>Empresa familiar con mas de 40 años de experiencia, dedicada a brindar servicios de belleza con atención personalizada,   se caracteriza por su estabilidad y, compromiso con la satisfacción del cliente y la confianza que ha construido a lo largo del tiempo. </p>
+                <p>HU1, HU2 y HU3: catálogo público, cuenta del cliente y agendamiento de citas.</p>
             </div>
             <div>
                 <h4>Horarios</h4>
