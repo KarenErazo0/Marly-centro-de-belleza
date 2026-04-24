@@ -7,7 +7,6 @@
     <div class="contenedor">
         <div class="encabezado-reserva-simple">
             <div>
-                <span class="etiqueta">HU3 · Agendamiento</span>
                 <h1>Mis citas</h1>
                 <p>Consulta tus reservas registradas y agenda una nueva cita cuando lo necesites.</p>
             </div>
