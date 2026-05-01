@@ -14,10 +14,14 @@
             <nav class="enlaces-navegacion">
                 <a href="{{ route('inicio') }}#servicios">Servicios</a>
                 <a href="{{ route('inicio') }}#contacto">Contacto</a>
-                @if(session('cliente_id'))
+                @if(session('admin_autenticado'))
+                    <a href="{{ route('admin.dashboard') }}">Panel admin</a>
+                    <form action="{{ route('cliente.salir') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="boton-enlace">Cerrar sesión</button>
+                    </form>
+                @elseif(session('cliente_id'))
                     <a href="{{ route('cliente.citas.index') }}">Mis citas</a>
-                @endif
-                @if(session('cliente_id'))
                     <a href="{{ route('cliente.cuenta') }}">Mi cuenta</a>
                     <form action="{{ route('cliente.salir') }}" method="POST">
                         @csrf

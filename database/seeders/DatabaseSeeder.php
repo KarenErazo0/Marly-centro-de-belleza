@@ -71,5 +71,15 @@ class DatabaseSeeder extends Seeder
                 'fecha_registro' => now(),
             ]
         );
+
+        Cliente::updateOrCreate(
+            ['correo_electronico' => 'admin@marly.com'],
+            [
+                'nombre_completo' => 'Administradora Marly',
+                'telefono' => '3150000000',
+                'contrasena' => Hash::make('admin12345'),
+                'fecha_registro' => now(),
+            ]
+        );
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ControladorAdminDashboard;
 use App\Http\Controllers\Cliente\Autenticacion\ControladorAutenticacionCliente;
 use App\Http\Controllers\Cliente\Citas\ControladorCitasCliente;
 use App\Http\Controllers\Cliente\Cuenta\ControladorCuentaCliente;
@@ -7,6 +8,11 @@ use App\Http\Controllers\Inicio\InicioController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [InicioController::class, 'index'])->name('inicio');
+
+
+Route::prefix('admin')->name('admin.')->middleware('admin.sesion')->group(function () {
+    Route::get('/dashboard', [ControladorAdminDashboard::class, 'index'])->name('dashboard');
+});
 
 Route::prefix('cliente')->name('cliente.')->group(function () {
     Route::get('/registro', [ControladorAutenticacionCliente::class, 'mostrarRegistro'])->name('registro');

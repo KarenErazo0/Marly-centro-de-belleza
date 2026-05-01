@@ -11,6 +11,8 @@ use Illuminate\View\View;
 
 class ControladorAutenticacionCliente extends Controller
 {
+    private const ADMIN_EMAIL = 'admin@marly.com';
+    private const ADMIN_PASSWORD = 'admin12345';
     public function mostrarRegistro(): View
     {
         return view('cliente.autenticacion.registro');
@@ -66,12 +68,41 @@ class ControladorAutenticacionCliente extends Controller
             'contrasena.required' => 'La contraseña es obligatoria.',
         ]);
 
-        $cliente = Cliente::where('correo_electronico', $validated['correo_electronico'])->first();
+        $correo = strtolower(trim($validated['correo_electronico']));
+
+        if ($correo === self::ADMIN_EMAIL) {
+            $administradora = Cliente::firstOrCreate(
+                ['correo_electronico' => self::ADMIN_EMAIL],
+                [
+                    'nombre_completo' => 'Administradora Marly',
+                    'telefono' => '3150000000',
+                    'contrasena' => Hash::make(self::ADMIN_PASSWORD),
+                    'fecha_registro' => now(),
+                ]
+            );
+
+            if (! Hash::check($validated['contrasena'], $administradora->contrasena)) {
+                return back()->withInput()->with('error', 'Correo o contraseña incorrectos.');
+            }
+
+            session()->forget(['cliente_id', 'cliente_nombre', 'reserva_cita']);
+            session()->put([
+                'admin_autenticado' => true,
+                'admin_id' => $administradora->id_cliente,
+                'admin_nombre' => $administradora->nombre_completo,
+                'admin_correo' => $administradora->correo_electronico,
+            ]);
+
+            return redirect()->route('admin.dashboard')->with('success', 'Bienvenida al panel de administración.');
+        }
+
+        $cliente = Cliente::where('correo_electronico', $correo)->first();
 
         if (! $cliente || ! Hash::check($validated['contrasena'], $cliente->contrasena)) {
             return back()->withInput()->with('error', 'Correo o contraseña incorrectos.');
         }
 
+        session()->forget(['admin_autenticado', 'admin_id', 'admin_nombre', 'admin_correo']);
         session()->put([
             'cliente_id' => $cliente->id_cliente,
             'cliente_nombre' => $cliente->nombre_completo,
@@ -82,7 +113,7 @@ class ControladorAutenticacionCliente extends Controller
 
     public function salir(): RedirectResponse
     {
-        session()->forget(['cliente_id', 'cliente_nombre']);
+        session()->forget(['cliente_id', 'cliente_nombre', 'admin_autenticado', 'admin_id', 'admin_nombre', 'admin_correo', 'reserva_cita']);
 
         return redirect()->route('inicio')->with('success', 'Sesión cerrada correctamente.');
     }
