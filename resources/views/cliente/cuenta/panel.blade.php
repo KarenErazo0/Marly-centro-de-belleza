@@ -5,23 +5,25 @@
 @section('content')
 <section class="seccion-cuenta">
     <div class="contenedor rejilla-cuenta">
-        <div class="tarjeta-cuenta bienvenida-cuenta">
-            <span class="etiqueta">Panel del cliente</span>
-            <h1>Hola, {{ $cliente->nombre_completo }}</h1>
-            <p>Desde aquí puedes actualizar tus datos, gestionar tus citas, cambiar tu contraseña, eliminar tu cuenta o cerrar sesión.</p>
+        <div class="tarjeta-cuenta bienvenida-cuenta cuenta-principal">
+            <div>
+                <h1>Hola, {{ $cliente->nombre_completo }}</h1>
+                <p>Desde aquí puedes gestionar tus citas, editar tus datos personales o cerrar sesión.</p>
 
-            <div class="acciones-formulario">
-                <a href="{{ route('cliente.citas.index') }}" class="boton boton-primario">Ver mis citas</a>
-                <a href="{{ route('cliente.citas.agendar.servicios') }}" class="boton boton-secundario">Agendar nueva cita</a>
+                <div class="acciones-panel-cliente">
+                    <a href="{{ route('cliente.citas.index') }}" class="boton boton-primario">Ver mis citas</a>
+                    <a href="{{ route('cliente.citas.agendar.servicios') }}" class="boton boton-secundario">Agendar nueva cita</a>
+                    <button type="button" class="boton boton-secundario" id="btn-editar-cuenta">Editar datos personales</button>
+                </div>
             </div>
 
-            <form action="{{ route('cliente.salir') }}" method="POST" class="bloque-sesion">
+            <form action="{{ route('cliente.salir') }}" method="POST" class="form-cerrar-sesion-cuenta">
                 @csrf
                 <button type="submit" class="boton boton-secundario">Cerrar sesión</button>
             </form>
         </div>
 
-        <div class="tarjeta-cuenta">
+        <div class="tarjeta-cuenta panel-edicion-cuenta" id="panel-edicion-cuenta">
             <h2>Modificar datos de la cuenta</h2>
             <form method="POST" action="{{ route('cliente.cuenta.actualizar') }}" class="rejilla-formulario">
                 @csrf
@@ -44,12 +46,13 @@
 
                 <div class="grupo-campo">
                     <label for="contrasena">Nueva contraseña (opcional)</label>
-                    <input type="password" id="contrasena" name="contrasena">
+                    <input type="password" id="contrasena" name="contrasena" minlength="8">
+                    <small class="ayuda-campo">Si deseas cambiarla, usa mínimo 8 caracteres.</small>
                 </div>
 
                 <div class="grupo-campo">
                     <label for="contrasena_confirmation">Confirmar nueva contraseña</label>
-                    <input type="password" id="contrasena_confirmation" name="contrasena_confirmation">
+                    <input type="password" id="contrasena_confirmation" name="contrasena_confirmation" minlength="8">
                 </div>
 
                 <div class="acciones-formulario">

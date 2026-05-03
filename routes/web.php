@@ -12,6 +12,7 @@ Route::get('/', [InicioController::class, 'index'])->name('inicio');
 
 Route::prefix('admin')->name('admin.')->middleware('admin.sesion')->group(function () {
     Route::get('/dashboard', [ControladorAdminDashboard::class, 'index'])->name('dashboard');
+    Route::patch('/citas/{cita}/asistencia', [ControladorAdminDashboard::class, 'actualizarAsistencia'])->name('citas.asistencia');
 });
 
 Route::prefix('cliente')->name('cliente.')->group(function () {
@@ -28,6 +29,9 @@ Route::prefix('cliente')->name('cliente.')->group(function () {
 
         Route::prefix('citas')->name('citas.')->group(function () {
             Route::get('/', [ControladorCitasCliente::class, 'index'])->name('index');
+            Route::get('/{cita}/editar', [ControladorCitasCliente::class, 'editar'])->name('editar');
+            Route::put('/{cita}', [ControladorCitasCliente::class, 'actualizar'])->name('actualizar');
+            Route::delete('/{cita}', [ControladorCitasCliente::class, 'cancelar'])->name('cancelar');
             Route::get('/agendar/servicios', [ControladorCitasCliente::class, 'seleccionarServicios'])->name('agendar.servicios');
             Route::post('/agendar/servicios', [ControladorCitasCliente::class, 'guardarServicios'])->name('agendar.servicios.guardar');
             Route::get('/agendar/trabajador', [ControladorCitasCliente::class, 'seleccionarTrabajador'])->name('agendar.trabajador');

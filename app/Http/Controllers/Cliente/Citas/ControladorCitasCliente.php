@@ -18,18 +18,40 @@ class ControladorCitasCliente extends Controller
 {
     private const SESSION_KEY = 'reserva_cita';
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        Carbon::setLocale('es');
         $cliente = Cliente::with(['citas.trabajador', 'citas.servicios', 'citas.detalles.trabajador', 'citas.detalles.servicio'])
             ->findOrFail(session('cliente_id'));
 
+        $busqueda = trim((string) $request->query('buscar', ''));
+
+        $citas = $cliente->citas()
+            ->with(['trabajador', 'servicios', 'detalles.trabajador', 'detalles.servicio'])
+            ->when($busqueda !== '', function ($query) use ($busqueda) {
+                $busquedaNormalizada = mb_strtolower($busqueda, 'UTF-8');
+                $busquedaTelefono = preg_replace('/\D+/', '', $busqueda);
+
+                $query->where(function ($subquery) use ($busquedaNormalizada, $busquedaTelefono) {
+                    $subquery->whereRaw('LOWER(nombre_cliente) LIKE ?', ["%{$busquedaNormalizada}%"])
+                        ->orWhereHas('servicios', function ($servicioQuery) use ($busquedaNormalizada) {
+                            $servicioQuery->whereRaw('LOWER(nombre_servicio) LIKE ?', ["%{$busquedaNormalizada}%"]);
+                        });
+
+                    if ($busquedaTelefono !== '') {
+                        $subquery->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(telefono_contacto, ' ', ''), '-', ''), '.', ''), '+', '') LIKE ?", ["%{$busquedaTelefono}%"]);
+                    }
+                });
+            })
+            ->orderByDesc('fecha_cita')
+            ->orderByDesc('hora_inicio')
+            ->get();
+
         return view('cliente.citas.index', [
             'cliente' => $cliente,
-            'citas' => $cliente->citas()
-                ->with(['trabajador', 'servicios', 'detalles.trabajador', 'detalles.servicio'])
-                ->orderByDesc('fecha_cita')
-                ->orderByDesc('hora_inicio')
-                ->get(),
+            'citas' => $citas,
+            'busqueda' => $busqueda,
+            'citasAgrupadas' => $this->agruparCitasPorTiempo($citas),
         ]);
     }
 
@@ -279,6 +301,148 @@ class ControladorCitasCliente extends Controller
         return redirect()->route('cliente.citas.index')->with('success', 'Tu cita fue registrada correctamente.');
     }
 
+    public function editar(Request $request, Cita $cita): View|RedirectResponse
+    {
+        Carbon::setLocale('es');
+        if ((int) $cita->id_cliente !== (int) session('cliente_id')) {
+            abort(403);
+        }
+
+        if (! $this->citaPuedeModificarse($cita)) {
+            return redirect()->route('cliente.citas.index')->with('error', 'Esta cita ya no se puede modificar.');
+        }
+
+        $cita->load(['trabajador', 'servicios', 'detalles.trabajador', 'detalles.servicio']);
+        $trabajadores = $cita->detalles->pluck('trabajador')->filter()->unique('id_trabajador')->values();
+        if ($trabajadores->isEmpty() && $cita->trabajador) {
+            $trabajadores = collect([$cita->trabajador]);
+        }
+
+        $fechaSeleccionada = $request->query('fecha', $cita->fecha_cita);
+        $horasDisponibles = $this->buildHorasDisponibles($trabajadores, $cita->servicios, $fechaSeleccionada, $cita->id_cita);
+
+        return view('cliente.citas.editar', [
+            'cita' => $cita,
+            'fechaSeleccionada' => $fechaSeleccionada,
+            'horasDisponibles' => $horasDisponibles,
+        ]);
+    }
+
+    public function actualizar(Request $request, Cita $cita): RedirectResponse
+    {
+        if ((int) $cita->id_cliente !== (int) session('cliente_id')) {
+            abort(403);
+        }
+
+        if (! $this->citaPuedeModificarse($cita)) {
+            return redirect()->route('cliente.citas.index')->with('error', 'Esta cita ya no se puede modificar.');
+        }
+
+        $validated = $request->validate([
+            'fecha' => ['required', 'date', 'after_or_equal:today'],
+            'hora' => ['required', 'date_format:H:i'],
+            'telefono_contacto' => ['required', 'string', 'max:20'],
+            'notas' => ['nullable', 'string', 'max:500'],
+        ], [
+            'fecha.required' => 'Debes seleccionar una fecha.',
+            'fecha.after_or_equal' => 'La fecha de la cita no puede ser anterior a hoy.',
+            'hora.required' => 'Debes seleccionar una hora disponible.',
+            'telefono_contacto.required' => 'El teléfono es obligatorio.',
+        ]);
+
+        $cita->load(['trabajador', 'servicios', 'detalles.trabajador']);
+        $trabajadores = $cita->detalles->pluck('trabajador')->filter()->unique('id_trabajador')->values();
+        if ($trabajadores->isEmpty() && $cita->trabajador) {
+            $trabajadores = collect([$cita->trabajador]);
+        }
+
+        $horasDisponibles = $this->buildHorasDisponibles($trabajadores, $cita->servicios, $validated['fecha'], $cita->id_cita);
+        if (! $horasDisponibles->contains($validated['hora'])) {
+            return back()->withInput()->with('error', 'La hora seleccionada no está disponible.');
+        }
+
+        $inicio = Carbon::createFromFormat('Y-m-d H:i', $validated['fecha'] . ' ' . $validated['hora']);
+        $fin = $inicio->copy()->addMinutes((int) $cita->duracion_total_minutos);
+
+        $cita->update([
+            'fecha_cita' => $inicio->format('Y-m-d'),
+            'hora_inicio' => $inicio->format('H:i:s'),
+            'hora_fin' => $fin->format('H:i:s'),
+            'telefono_contacto' => $validated['telefono_contacto'],
+            'notas' => $validated['notas'] ?? null,
+            'estado' => 'registrada',
+        ]);
+
+        return redirect()->route('cliente.citas.index')->with('success', 'Tu cita fue modificada correctamente.');
+    }
+
+    public function cancelar(Cita $cita): RedirectResponse
+    {
+        if ((int) $cita->id_cliente !== (int) session('cliente_id')) {
+            abort(403);
+        }
+
+        if (! $this->citaPuedeModificarse($cita)) {
+            return redirect()->route('cliente.citas.index')->with('error', 'Esta cita ya no se puede cancelar.');
+        }
+
+        $cita->update(['estado' => 'cancelada']);
+
+        return redirect()->route('cliente.citas.index')->with('success', 'Tu cita fue cancelada correctamente.');
+    }
+
+    private function citaPuedeModificarse(Cita $cita): bool
+    {
+        if (in_array($cita->estado, ['cancelada', 'completada', 'inasistencia'], true)) {
+            return false;
+        }
+
+        $inicio = Carbon::createFromFormat('Y-m-d H:i:s', $cita->fecha_cita . ' ' . $cita->hora_inicio);
+
+        return $inicio->isFuture();
+    }
+
+    private function agruparCitasPorTiempo(Collection $citas): Collection
+    {
+        $hoy = Carbon::today();
+        $inicioSemana = $hoy->copy()->startOfWeek(Carbon::MONDAY);
+        $finSemana = $hoy->copy()->endOfWeek(Carbon::SUNDAY);
+        $inicioSemanaPasada = $inicioSemana->copy()->subWeek();
+        $finSemanaPasada = $finSemana->copy()->subWeek();
+        $inicioMesAnterior = $hoy->copy()->subMonthNoOverflow()->startOfMonth();
+        $finMesAnterior = $hoy->copy()->subMonthNoOverflow()->endOfMonth();
+
+        $orden = [
+            'Proximas citas' => 1,
+            'Citas de esta semana' => 2,
+            'Citas de la semana pasada' => 3,
+            'Citas del anterior mes' => 4,
+            'Citas anteriores' => 5,
+        ];
+
+        return $citas->groupBy(function (Cita $cita) use ($hoy, $inicioSemana, $finSemana, $inicioSemanaPasada, $finSemanaPasada, $inicioMesAnterior, $finMesAnterior) {
+            $fecha = Carbon::parse($cita->fecha_cita);
+
+            if ($fecha->betweenIncluded($inicioSemana, $finSemana)) {
+                return 'Citas de esta semana';
+            }
+
+            if ($fecha->gt($finSemana)) {
+                return 'Proximas citas';
+            }
+
+            if ($fecha->betweenIncluded($inicioSemanaPasada, $finSemanaPasada)) {
+                return 'Citas de la semana pasada';
+            }
+
+            if ($fecha->betweenIncluded($inicioMesAnterior, $finMesAnterior)) {
+                return 'Citas del anterior mes';
+            }
+
+            return 'Citas anteriores';
+        })->sortBy(fn ($grupo, $nombre) => $orden[$nombre] ?? 99);
+    }
+
     private function getReserva(): array
     {
         return session(self::SESSION_KEY, []);
@@ -422,7 +586,7 @@ class ControladorCitasCliente extends Controller
         return $dias;
     }
 
-    private function buildHorasDisponibles(Collection $trabajadores, Collection $servicios, string $fecha): Collection
+    private function buildHorasDisponibles(Collection $trabajadores, Collection $servicios, string $fecha, ?int $ignorarCitaId = null): Collection
     {
         $fechaCarbon = Carbon::parse($fecha);
         if ($fechaCarbon->isSunday()) {
@@ -436,6 +600,7 @@ class ControladorCitasCliente extends Controller
         $citasPorTrabajador = Cita::whereIn('id_trabajador', $trabajadores->pluck('id_trabajador')->unique()->all())
             ->where('fecha_cita', $fechaCarbon->format('Y-m-d'))
             ->whereIn('estado', ['registrada', 'confirmada'])
+            ->when($ignorarCitaId, fn ($query) => $query->where('id_cita', '!=', $ignorarCitaId))
             ->orderBy('hora_inicio')
             ->get(['id_trabajador', 'hora_inicio', 'hora_fin'])
             ->groupBy('id_trabajador');

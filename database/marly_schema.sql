@@ -47,3 +47,5 @@ CREATE TABLE cita_servicio (
     CONSTRAINT fk_cita_servicio_cita FOREIGN KEY (id_cita) REFERENCES citas(id_cita) ON DELETE CASCADE,
     CONSTRAINT fk_cita_servicio_servicio FOREIGN KEY (id_servicio) REFERENCES servicios(id_servicio)
 );
+
+-- HU06/HU07: las migraciones Laravel actuales usan el campo citas.estado con valores: registrada, confirmada, cancelada, completada, inasistencia.

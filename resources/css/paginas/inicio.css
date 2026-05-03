@@ -119,3 +119,100 @@
         align-items: stretch;
     }
 }
+
+/* Ajustes visuales solicitados */
+.seccion-hero {
+    background: radial-gradient(circle at top left, #fff0f5 0, #fffafb 38%, #ffffff 100%);
+    padding: 86px 0 70px;
+}
+.rejilla-hero { align-items: center; }
+.hero-contenido h1 { font-size: clamp(2.4rem, 5vw, 4.8rem); line-height: 1.02; letter-spacing: -.04em; }
+.hero-contenido > p { font-size: 1.18rem; max-width: 620px; }
+.hero-agenda {
+    margin-top: 28px;
+    padding: 24px;
+    border: 1px solid var(--color-borde);
+    border-radius: 24px;
+    background: rgba(255,255,255,.78);
+    box-shadow: var(--sombra-suave);
+}
+.hero-agenda h2 { margin: 0 0 8px; color: #2d2024; }
+.hero-agenda p { margin: 0 0 18px; color: var(--color-texto-suave); }
+.hero-imagen-salon {
+    position: relative;
+    min-height: 520px;
+    overflow: hidden;
+    border-radius: 34px;
+    box-shadow: 0 24px 60px rgba(183,110,121,.18);
+    border: 1px solid #f1d9de;
+}
+.hero-imagen-salon img { width: 100%; height: 100%; min-height: 520px; object-fit: cover; }
+.hero-imagen-etiqueta {
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 22px;
+    padding: 18px;
+    border-radius: 22px;
+    background: rgba(255,255,255,.88);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 14px 30px rgba(45,32,36,.12);
+}
+.hero-imagen-etiqueta strong { display: block; color: #2d2024; font-size: 1.1rem; }
+.hero-imagen-etiqueta span { color: var(--color-texto-suave); }
+.seccion-carrusel { padding: 70px 0; background: #fff; }
+.carrusel-fotos {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(260px, 1fr);
+    gap: 18px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 10px 4px 18px;
+}
+.item-carrusel {
+    height: 320px;
+    border-radius: 26px;
+    overflow: hidden;
+    scroll-snap-align: start;
+    border: 1px solid var(--color-borde);
+    box-shadow: 0 14px 34px rgba(183,110,121,.09);
+    background: #fff;
+}
+.item-carrusel img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+.item-carrusel:hover img { transform: scale(1.05); }
+.seccion-mision-vision { padding: 70px 0; background: #fff7fa; }
+.rejilla-mision-vision { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.tarjeta-mision {
+    background: #fff;
+    border: 1px solid var(--color-borde);
+    border-radius: 28px;
+    padding: 30px;
+    box-shadow: var(--sombra-suave);
+}
+.tarjeta-mision h3 { margin: 16px 0 10px; color: #2d2024; font-size: 1.6rem; }
+.tarjeta-mision p { color: var(--color-texto-suave); line-height: 1.75; margin: 0; }
+.rejilla-contacto-mapa { display: grid; grid-template-columns: .9fr 1.1fr; gap: 24px; align-items: stretch; }
+.tarjeta-contacto-principal { min-height: 100%; }
+.redes-contacto { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+.redes-contacto a {
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: #fff0f5;
+    color: var(--color-primario-oscuro);
+    font-weight: 700;
+    border: 1px solid var(--color-borde);
+}
+.tarjeta-mapa {
+    min-height: 390px;
+    border: 1px solid var(--color-borde);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--sombra-suave);
+    background: #fff;
+}
+.tarjeta-mapa iframe { width: 100%; height: 100%; min-height: 390px; border: 0; }
+@media (max-width: 992px) {
+    .hero-imagen-salon, .hero-imagen-salon img { min-height: 360px; }
+    .rejilla-mision-vision, .rejilla-contacto-mapa { grid-template-columns: 1fr; }
+}

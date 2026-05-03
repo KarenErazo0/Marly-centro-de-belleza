@@ -19,7 +19,7 @@ return new class extends Migration
             $table->time('hora_fin');
             $table->unsignedInteger('duracion_total_minutos');
             $table->text('notas')->nullable();
-            $table->enum('estado', ['registrada', 'confirmada', 'cancelada', 'completada'])->default('registrada');
+            $table->enum('estado', ['registrada', 'confirmada', 'cancelada', 'completada', 'inasistencia'])->default('registrada');
             $table->dateTime('fecha_registro');
 
             $table->foreign('id_cliente')->references('id_cliente')->on('clientes')->onDelete('cascade');

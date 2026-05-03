@@ -6,7 +6,7 @@
 <section class="seccion-formulario">
     <div class="contenedor contenedor-formulario">
         <div class="tarjeta-formulario">
-            <h1>Iniciar sesión</h1>
+            <span class="etiqueta">Iniciar sesión</span>
             <p>Accede con tu correo electrónico y tu contraseña.</p>
 
             <form method="POST" action="{{ route('cliente.ingresar.validar') }}" class="rejilla-formulario">

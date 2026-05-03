@@ -6,8 +6,8 @@
 <section class="seccion-formulario">
     <div class="contenedor contenedor-formulario">
         <div class="tarjeta-formulario">
-            <h1>Crear cuenta</h1>
-            <p>Completa tus datos para registrarte en la plataforma.</p>
+            <h1>Registro en Marly Centro de Belleza</h1>
+            <p>Completa cada uno de tus datos para realizar el registro</p>
 
             <form method="POST" action="{{ route('cliente.registro.guardar') }}" class="rejilla-formulario">
                 @csrf
@@ -29,12 +29,13 @@
 
                 <div class="grupo-campo">
                     <label for="contrasena">Contraseña</label>
-                    <input type="password" id="contrasena" name="contrasena" required>
+                    <input type="password" id="contrasena" name="contrasena" minlength="8" required>
+                    <small class="ayuda-campo">La contraseña debe tener mínimo 8 caracteres.</small>
                 </div>
 
                 <div class="grupo-campo">
                     <label for="contrasena_confirmation">Confirmar contraseña</label>
-                    <input type="password" id="contrasena_confirmation" name="contrasena_confirmation" required>
+                    <input type="password" id="contrasena_confirmation" name="contrasena_confirmation" minlength="8" required>
                 </div>
 
                 <div class="acciones-formulario">

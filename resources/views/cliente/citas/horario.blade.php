@@ -12,67 +12,57 @@
             <span class="paso-reserva">4. Confirmación</span>
         </div>
 
-        <div class="encabezado-seccion reserva-centro">
-            <h1>Selecciona fecha y hora</h1>
-            <p>Elige el día y la hora en que todos los profesionales seleccionados estén disponibles.</p>
+        <div class="encabezado-seccion reserva-centro encabezado-horario-simple">
+            <h1>Selecciona el horario de tu cita</h1>
         </div>
 
-        <div class="tarjeta-horario">
-            <div class="resumen-agendamiento-top">
-                <div>
-                    <strong>Profesionales seleccionados:</strong>
-                    <div class="chips-reserva chips-profesionales">
-                        @foreach($trabajadores as $trabajador)
-                            <span class="chip-servicio">{{ $trabajador->nombre_completo }}</span>
-                        @endforeach
-                    </div>
-                </div>
-                <div class="chips-reserva">
-                    @foreach($servicios as $servicio)
-                        <span class="chip-servicio">{{ $servicio->nombre_servicio }}</span>
-                    @endforeach
-                </div>
-                <div><strong>Duración estimada:</strong> {{ $duracionTotal }} minutos</div>
-            </div>
+        <div class="aviso-horario-salon">
+            <strong>Horario del salón:</strong> Lunes a viernes de 7:00 am a 7:00 pm y sábados o festivos de 8:00 am a 7:00 pm
+        </div>
 
+        <div class="tarjeta-horario tarjeta-horario-nueva">
             <form action="{{ route('cliente.citas.agendar.horario.guardar') }}" method="POST" id="form-seleccion-horario">
                 @csrf
-                <div class="grupo-seleccion-horario">
-                    <h3>Selecciona una fecha</h3>
-                    <div class="rejilla-fechas">
-                        @foreach($diasDisponibles as $dia)
-                            <a href="{{ route('cliente.citas.agendar.horario', ['fecha' => $dia['fecha']]) }}" class="item-fecha-link">
-                                <span class="item-fecha {{ $fechaSeleccionada === $dia['fecha'] ? 'seleccionado' : '' }}">
-                                    <span class="dia-semana">{{ $dia['dia_semana'] }}</span>
-                                    <strong>{{ $dia['dia'] }}</strong>
-                                    <span>{{ $dia['mes'] }}</span>
-                                </span>
-                            </a>
-                        @endforeach
+
+                <div class="layout-horario-resumen">
+                    <div class="panel-selector-horario">
+                        <div class="grupo-campo">
+                            <label for="fecha_selector">Fecha de la cita</label>
+                            <input
+                                type="date"
+                                id="fecha_selector"
+                                name="fecha"
+                                value="{{ $fechaSeleccionada }}"
+                                min="{{ now()->format('Y-m-d') }}"
+                                data-url-base="{{ route('cliente.citas.agendar.horario') }}"
+                                required
+                            >
+                            <small class="ayuda-campo">Puedes escribir la fecha o seleccionarla desde el calendario. Los domingos no hay atención.</small>
+                        </div>
+
+                        <div class="grupo-campo">
+                            <label for="hora_selector">Hora disponible</label>
+                            <select id="hora_selector" name="hora" required>
+                                <option value="">Selecciona una hora</option>
+                                @forelse($horasDisponibles as $hora)
+                                    <option value="{{ $hora }}" {{ ($reserva['hora'] ?? null) === $hora ? 'selected' : '' }}>
+                                        {{ \Carbon\Carbon::createFromFormat('H:i', $hora)->translatedFormat('h:i A') }}
+                                    </option>
+                                @empty
+                                    <option value="" disabled>No hay horarios disponibles para esta fecha</option>
+                                @endforelse
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <input type="hidden" name="fecha" value="{{ $fechaSeleccionada }}">
-
-                <div class="grupo-seleccion-horario">
-                    <h3>Selecciona una hora</h3>
-                    <div class="rejilla-horas">
-                        @forelse($horasDisponibles as $hora)
-                            <label class="item-hora item-hora-opcion {{ ($reserva['hora'] ?? null) === $hora ? 'seleccionado' : '' }}">
-                                <input type="radio" name="hora" value="{{ $hora }}" {{ ($reserva['hora'] ?? null) === $hora ? 'checked' : '' }}>
-                                {{ \Carbon\Carbon::createFromFormat('H:i', $hora)->translatedFormat('h:i A') }}
-                            </label>
-                        @empty
-                            <p class="mensaje-sin-horas">No hay horarios disponibles para la fecha seleccionada.</p>
-                        @endforelse
-                    </div>
-                </div>
-
-                <div class="resumen-cita-previa">
-                    <h4>Tu cita será:</h4>
-                    <p><strong>Fecha:</strong> {{ $fechaSeleccionada ? \Carbon\Carbon::parse($fechaSeleccionada)->translatedFormat('l, j \d\e F \d\e Y') : 'Pendiente' }}</p>
-                    <p><strong>Hora:</strong> {{ !empty($reserva['hora']) ? \Carbon\Carbon::createFromFormat('H:i', $reserva['hora'])->translatedFormat('h:i A') : 'Pendiente' }}</p>
-                    <p><strong>Horario del salón:</strong> lunes a viernes de 7:00 a. m. a 7:00 p. m. y sábados de 8:00 a. m. a 7:00 p. m.</p>
+                    <aside class="resumen-horario-vivo">
+                        <h3>Tu cita será:</h3>
+                        <p><strong>Fecha:</strong> <span id="resumen-fecha-horario">{{ $fechaSeleccionada ? ucfirst(\Carbon\Carbon::parse($fechaSeleccionada)->translatedFormat('l, j \d\e F \d\e Y')) : 'Pendiente' }}</span></p>
+                        <p><strong>Hora:</strong> <span id="resumen-hora-horario">{{ !empty($reserva['hora']) ? \Carbon\Carbon::createFromFormat('H:i', $reserva['hora'])->translatedFormat('h:i A') : 'Pendiente' }}</span></p>
+                        <div class="linea-resumen"></div>
+                        <p><strong>Servicio:</strong> {{ $servicios->pluck('nombre_servicio')->join(', ') }}</p>
+                        <p><strong>Profesionales seleccionados:</strong> {{ $trabajadores->pluck('nombre_completo')->join(', ') }}</p>
+                    </aside>
                 </div>
 
                 <div class="acciones-reserva-final">
