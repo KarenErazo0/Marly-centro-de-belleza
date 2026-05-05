@@ -4,11 +4,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cita;
+use App\Models\Cliente;
+use App\Models\ConfiguracionSitio;
+use App\Models\Servicio;
+use App\Models\Trabajador;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class ControladorAdminDashboard extends Controller
@@ -17,31 +24,25 @@ class ControladorAdminDashboard extends Controller
     {
         Carbon::setLocale('es');
         $hoy = Carbon::today();
-        $fechaSeleccionada = $request->query('fecha')
-            ? Carbon::parse($request->query('fecha'))
-            : $hoy->copy();
-
-        $mesActual = $request->query('mes')
-            ? Carbon::createFromFormat('Y-m', $request->query('mes'))->startOfMonth()
-            : $fechaSeleccionada->copy()->startOfMonth();
-
+        $fechaSeleccionada = $request->query('fecha') ? Carbon::parse($request->query('fecha')) : $hoy->copy();
+        $mesActual = $request->query('mes') ? Carbon::createFromFormat('Y-m', $request->query('mes'))->startOfMonth() : $fechaSeleccionada->copy()->startOfMonth();
         $inicioMes = $mesActual->copy()->startOfMonth();
         $finMes = $mesActual->copy()->endOfMonth();
         $busqueda = trim((string) $request->query('buscar', ''));
+        $tab = in_array($request->query('tab'), ['configuracion', 'servicios', 'personal', 'citas', 'clientes'], true) ? $request->query('tab') : 'personal';
 
         $citasPorDia = Cita::whereBetween('fecha_cita', [$inicioMes->format('Y-m-d'), $finMes->format('Y-m-d')])
             ->selectRaw('fecha_cita, COUNT(*) as total')
             ->groupBy('fecha_cita')
             ->pluck('total', 'fecha_cita');
 
-        $citasFechaSeleccionada = $this->obtenerCitasPorFecha($fechaSeleccionada, $busqueda);
-        $citasHoy = $this->obtenerCitasPorFecha($hoy, $busqueda);
-        $todasCitas = $this->consultaCitas($busqueda)
-            ->orderByDesc('fecha_cita')
-            ->orderByDesc('hora_inicio')
-            ->get();
+        $todasCitas = $this->consultaCitas($busqueda)->orderByDesc('fecha_cita')->orderByDesc('hora_inicio')->get();
+        $servicios = Servicio::with(['trabajadores' => fn ($q) => $q->orderBy('nombre_completo')])->orderBy('nombre_servicio')->get();
+        $trabajadores = Trabajador::with('servicios')->orderBy('nombre_completo')->get();
+        $clientes = Cliente::orderByDesc('fecha_registro')->get();
 
         return view('admin.dashboard', [
+            'tab' => $tab,
             'hoy' => $hoy,
             'fechaSeleccionada' => $fechaSeleccionada,
             'mesActual' => $mesActual,
@@ -50,19 +51,197 @@ class ControladorAdminDashboard extends Controller
             'inicioCalendario' => $inicioMes->copy()->startOfWeek(Carbon::MONDAY),
             'finCalendario' => $finMes->copy()->endOfWeek(Carbon::SUNDAY),
             'citasPorDia' => $citasPorDia,
-            'citasFechaSeleccionada' => $citasFechaSeleccionada,
-            'citasHoy' => $citasHoy,
+            'citasFechaSeleccionada' => $this->obtenerCitasPorFecha($fechaSeleccionada, $busqueda),
+            'citasHoy' => $this->obtenerCitasPorFecha($hoy, $busqueda),
             'todasCitas' => $todasCitas,
             'busqueda' => $busqueda,
             'citasAgrupadas' => $this->agruparCitasPorTiempo($todasCitas),
+            'servicios' => $servicios,
+            'trabajadores' => $trabajadores,
+            'clientes' => $clientes,
+            'configuracion' => $this->configuracionSitio(),
         ]);
+    }
+
+    public function actualizarConfiguracion(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'contacto_ubicacion' => ['required', 'string', 'max:120'],
+            'contacto_telefono' => ['required', 'string', 'max:30'],
+            'contacto_correo' => ['required', 'email', 'max:120'],
+            'contacto_horario' => ['required', 'string', 'max:500'],
+            'instagram_url' => ['nullable', 'url', 'max:255'],
+            'whatsapp_url' => ['nullable', 'url', 'max:255'],
+            'hero_imagen' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+        ], [], [
+            'hero_imagen' => 'imagen principal',
+            'contacto_ubicacion' => 'ubicación',
+            'contacto_telefono' => 'teléfono',
+            'contacto_correo' => 'correo',
+            'contacto_horario' => 'horario',
+        ]);
+
+        $configuracion = $this->configuracionSitio();
+        if ($request->hasFile('hero_imagen')) {
+            $validated['hero_imagen'] = $this->guardarImagen($request, 'hero_imagen', 'site', 'hero-admin');
+            $this->eliminarImagenPublica($configuracion->hero_imagen, 'images/site/');
+        }
+
+        $configuracion->fill($validated)->save();
+
+        return redirect()->route('admin.dashboard', ['tab' => 'configuracion'])->with('success', 'La página principal fue actualizada correctamente.');
+    }
+
+    public function guardarServicio(Request $request): RedirectResponse
+    {
+        $validated = $request->validate($this->reglasServicio(true), [], $this->atributosServicio());
+        if ($request->hasFile('imagen')) {
+            $validated['imagen'] = $this->guardarImagen($request, 'imagen', 'services', 'admin-service');
+        }
+        $validated['estado'] = $request->boolean('estado') ? 'activo' : 'inactivo';
+
+        Servicio::create($validated);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'servicios'])->with('success', 'Servicio agregado correctamente.');
+    }
+
+    public function actualizarServicio(Request $request, Servicio $servicio): RedirectResponse
+    {
+        $validated = $request->validate($this->reglasServicio(false), [], $this->atributosServicio());
+        if ($request->hasFile('imagen')) {
+            $validated['imagen'] = $this->guardarImagen($request, 'imagen', 'services', 'admin-service');
+            $this->eliminarImagenPublica($servicio->imagen, 'images/services/');
+        }
+        $validated['estado'] = $request->boolean('estado') ? 'activo' : 'inactivo';
+        $servicio->update($validated);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'servicios'])->with('success', 'Servicio actualizado correctamente.');
+    }
+
+    public function cambiarEstadoServicio(Servicio $servicio): RedirectResponse
+    {
+        $servicio->update(['estado' => $servicio->estado === 'activo' ? 'inactivo' : 'activo']);
+        $mensaje = $servicio->estado === 'activo' ? 'Servicio activado y visible para clientes.' : 'Servicio desactivado y oculto para clientes.';
+
+        return redirect()->route('admin.dashboard', ['tab' => 'servicios'])->with('success', $mensaje);
+    }
+
+    public function eliminarServicio(Servicio $servicio): RedirectResponse
+    {
+        try {
+            $imagen = $servicio->imagen;
+            $servicio->delete();
+            $this->eliminarImagenPublica($imagen, 'images/services/');
+            return redirect()->route('admin.dashboard', ['tab' => 'servicios'])->with('success', 'Servicio eliminado completamente del catálogo.');
+        } catch (QueryException $exception) {
+            return back()->with('error', 'No se pudo eliminar el servicio porque está relacionado con registros existentes. Puedes dejarlo inactivo para ocultarlo al cliente.');
+        }
+    }
+
+    public function crearSeccionPersonal(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'nombre_servicio' => ['required', 'string', 'max:100', 'unique:servicios,nombre_servicio'],
+        ], [], ['nombre_servicio' => 'nombre de la sección']);
+
+        Servicio::create([
+            'nombre_servicio' => $validated['nombre_servicio'],
+            'descripcion' => 'Sección administrativa para agrupar trabajadores. Edita esta descripción desde Gestión de servicios si deseas mostrarla al cliente.',
+            'precio' => 0,
+            'duracion_minutos' => 30,
+            'estado' => 'inactivo',
+            'imagen' => 'default-service.jpg',
+        ]);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Sección creada correctamente.');
+    }
+
+
+    public function actualizarSeccionPersonal(Request $request, Servicio $servicio): RedirectResponse
+    {
+        $validated = $request->validate([
+            'nombre_servicio' => ['required', 'string', 'max:100'],
+        ], [], ['nombre_servicio' => 'nombre de la sección']);
+
+        $servicio->update([
+            'nombre_servicio' => $validated['nombre_servicio'],
+        ]);
+
+        foreach ($servicio->trabajadores as $trabajador) {
+            $trabajador->update(['especialidad' => $validated['nombre_servicio']]);
+        }
+
+        return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Sección actualizada correctamente.');
+    }
+
+    public function guardarTrabajador(Request $request): RedirectResponse
+    {
+        $validated = $request->validate($this->reglasTrabajador(true), [], $this->atributosTrabajador());
+        $servicio = Servicio::findOrFail($validated['id_servicio']);
+        if ($request->hasFile('foto')) {
+            $validated['foto'] = $this->guardarImagen($request, 'foto', 'services', 'admin-worker');
+        }
+
+        $trabajador = Trabajador::create([
+            'nombre_completo' => $validated['nombre_completo'],
+            'especialidad' => $servicio->nombre_servicio,
+            'anios_experiencia' => 0,
+            'total_resenas' => 0,
+            'calificacion' => 5.0,
+            'foto' => $validated['foto'] ?? 'default-service.jpg',
+            'estado' => 'activo',
+        ]);
+        $trabajador->servicios()->sync([$servicio->id_servicio]);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Trabajador agregado correctamente.');
+    }
+
+    public function actualizarTrabajador(Request $request, Trabajador $trabajador): RedirectResponse
+    {
+        $validated = $request->validate($this->reglasTrabajador(false), [], $this->atributosTrabajador());
+        $servicio = Servicio::findOrFail($validated['id_servicio']);
+        $data = [
+            'nombre_completo' => $validated['nombre_completo'],
+            'especialidad' => $servicio->nombre_servicio,
+        ];
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $this->guardarImagen($request, 'foto', 'services', 'admin-worker');
+            $this->eliminarImagenPublica($trabajador->foto, 'images/services/');
+        }
+        $trabajador->update($data);
+        $trabajador->servicios()->sync([$servicio->id_servicio]);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Trabajador actualizado correctamente.');
+    }
+
+    public function eliminarTrabajador(Trabajador $trabajador): RedirectResponse
+    {
+        try {
+            $foto = $trabajador->foto;
+            $trabajador->delete();
+            $this->eliminarImagenPublica($foto, 'images/services/');
+            return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Trabajador eliminado correctamente.');
+        } catch (QueryException $exception) {
+            return back()->with('error', 'No se pudo eliminar el trabajador porque tiene citas asociadas. Puedes conservarlo para mantener el historial de citas.');
+        }
+    }
+
+    public function eliminarSeccionPersonal(Servicio $servicio): RedirectResponse
+    {
+        try {
+            $servicio->trabajadores()->detach();
+            $imagen = $servicio->imagen;
+            $servicio->delete();
+            $this->eliminarImagenPublica($imagen, 'images/services/');
+            return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Sección eliminada correctamente.');
+        } catch (QueryException $exception) {
+            return back()->with('error', 'No se pudo eliminar la sección porque tiene registros asociados.');
+        }
     }
 
     public function actualizarAsistencia(Request $request, Cita $cita): RedirectResponse
     {
-        $validated = $request->validate([
-            'estado' => ['required', 'in:completada,inasistencia'],
-        ]);
+        $validated = $request->validate(['estado' => ['required', 'in:completada,inasistencia']]);
 
         if ($cita->estado === 'cancelada') {
             return back()->with('error', 'No se puede registrar asistencia en una cita cancelada.');
@@ -73,14 +252,108 @@ class ControladorAdminDashboard extends Controller
         }
 
         $this->garantizarEstadosCitasHu07();
-
         $cita->update(['estado' => $validated['estado']]);
 
-        $mensaje = $validated['estado'] === 'completada'
-            ? 'La cita fue marcada como asistida correctamente.'
-            : 'La cita fue marcada como no asistida correctamente.';
+        $mensaje = $validated['estado'] === 'completada' ? 'La cita fue marcada como asistida correctamente.' : 'La cita fue marcada como no asistida correctamente.';
 
         return back()->with('success', $mensaje);
+    }
+
+    private function configuracionSitio(): ConfiguracionSitio
+    {
+        $this->garantizarTablaConfiguracionSitio();
+
+        return ConfiguracionSitio::firstOrCreate([], [
+            'hero_imagen' => 'default-service.jpg',
+            'contacto_ubicacion' => 'Pasto, Nariño',
+            'contacto_telefono' => '7291317',
+            'contacto_correo' => 'marly@centrobelleza.com',
+            'contacto_horario' => 'lunes a viernes de 7:00 a.m. a 7:00 p.m. y sábados y festivos de 8:00 a.m. a 7:00 p.m.',
+            'instagram_url' => 'https://www.instagram.com/marly.salon?igsh=eGhtNTZscnZ1cnR3',
+            'whatsapp_url' => 'https://wa.link/rsduzp',
+        ]);
+    }
+
+    private function garantizarTablaConfiguracionSitio(): void
+    {
+        if (Schema::hasTable('configuracion_sitio')) {
+            return;
+        }
+
+        Schema::create('configuracion_sitio', function ($table) {
+            $table->id();
+            $table->string('hero_imagen')->nullable();
+            $table->string('contacto_ubicacion')->default('Pasto, Nariño');
+            $table->string('contacto_telefono', 30)->default('7291317');
+            $table->string('contacto_correo')->default('marly@centrobelleza.com');
+            $table->text('contacto_horario')->nullable();
+            $table->string('instagram_url')->nullable();
+            $table->string('whatsapp_url')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    private function guardarImagen(Request $request, string $campo, string $carpeta, string $prefijo): string
+    {
+        $archivo = $request->file($campo);
+        $nombre = $prefijo . '-' . uniqid() . '.' . $archivo->getClientOriginalExtension();
+        $destino = public_path('images/' . $carpeta);
+        File::ensureDirectoryExists($destino);
+        $archivo->move($destino, $nombre);
+        return $nombre;
+    }
+
+    private function eliminarImagenPublica(?string $archivo, string $carpetaRelativa): void
+    {
+        if (! $archivo || ! str_starts_with($archivo, 'admin-') && ! str_starts_with($archivo, 'hero-admin-')) {
+            return;
+        }
+
+        $ruta = public_path($carpetaRelativa . $archivo);
+        if (File::exists($ruta)) {
+            File::delete($ruta);
+        }
+    }
+
+    private function reglasServicio(bool $crear): array
+    {
+        return [
+            'nombre_servicio' => ['required', 'string', 'max:100'],
+            'descripcion' => ['required', 'string', 'max:700'],
+            'precio' => ['required', 'numeric', 'min:0'],
+            'duracion_minutos' => ['required', 'integer', 'min:1', 'max:600'],
+            'estado' => ['nullable'],
+            'imagen' => [$crear ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+        ];
+    }
+
+    private function atributosServicio(): array
+    {
+        return [
+            'nombre_servicio' => 'nombre del servicio',
+            'descripcion' => 'descripción',
+            'precio' => 'precio estimado',
+            'duracion_minutos' => 'duración estimada',
+            'imagen' => 'foto del servicio',
+        ];
+    }
+
+    private function reglasTrabajador(bool $crear): array
+    {
+        return [
+            'nombre_completo' => ['required', 'string', 'max:100'],
+            'id_servicio' => ['required', 'exists:servicios,id_servicio'],
+            'foto' => [$crear ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+        ];
+    }
+
+    private function atributosTrabajador(): array
+    {
+        return [
+            'nombre_completo' => 'nombre del trabajador',
+            'id_servicio' => 'sección o servicio',
+            'foto' => 'foto del trabajador',
+        ];
     }
 
     private function garantizarEstadosCitasHu07(): void
@@ -88,17 +361,12 @@ class ControladorAdminDashboard extends Controller
         try {
             DB::statement("ALTER TABLE citas MODIFY estado ENUM('registrada','confirmada','cancelada','completada','inasistencia') NOT NULL DEFAULT 'registrada'");
         } catch (\Throwable $exception) {
-            // Si la columna ya está actualizada o la base no permite el ALTER en este momento,
-            // se continúa para no interrumpir el flujo normal de la aplicación.
         }
     }
 
     private function obtenerCitasPorFecha(Carbon $fecha, string $busqueda = ''): Collection
     {
-        return $this->consultaCitas($busqueda)
-            ->where('fecha_cita', $fecha->format('Y-m-d'))
-            ->orderBy('hora_inicio')
-            ->get();
+        return $this->consultaCitas($busqueda)->where('fecha_cita', $fecha->format('Y-m-d'))->orderBy('hora_inicio')->get();
     }
 
     private function consultaCitas(string $busqueda = '')
@@ -110,18 +378,12 @@ class ControladorAdminDashboard extends Controller
 
                 $query->where(function ($subquery) use ($busquedaNormalizada, $busquedaTelefono) {
                     $subquery->whereRaw('LOWER(nombre_cliente) LIKE ?', ["%{$busquedaNormalizada}%"])
-                        ->orWhereHas('cliente', function ($clienteQuery) use ($busquedaNormalizada) {
-                            $clienteQuery->whereRaw('LOWER(nombre_completo) LIKE ?', ["%{$busquedaNormalizada}%"]);
-                        })
-                        ->orWhereHas('servicios', function ($servicioQuery) use ($busquedaNormalizada) {
-                            $servicioQuery->whereRaw('LOWER(nombre_servicio) LIKE ?', ["%{$busquedaNormalizada}%"]);
-                        });
+                        ->orWhereHas('cliente', fn ($clienteQuery) => $clienteQuery->whereRaw('LOWER(nombre_completo) LIKE ?', ["%{$busquedaNormalizada}%"]))
+                        ->orWhereHas('servicios', fn ($servicioQuery) => $servicioQuery->whereRaw('LOWER(nombre_servicio) LIKE ?', ["%{$busquedaNormalizada}%"]));
 
                     if ($busquedaTelefono !== '') {
                         $subquery->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(telefono_contacto, ' ', ''), '-', ''), '.', ''), '+', '') LIKE ?", ["%{$busquedaTelefono}%"])
-                            ->orWhereHas('cliente', function ($clienteQuery) use ($busquedaTelefono) {
-                                $clienteQuery->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(telefono, ' ', ''), '-', ''), '.', ''), '+', '') LIKE ?", ["%{$busquedaTelefono}%"]);
-                            });
+                            ->orWhereHas('cliente', fn ($clienteQuery) => $clienteQuery->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(telefono, ' ', ''), '-', ''), '.', ''), '+', '') LIKE ?", ["%{$busquedaTelefono}%"]));
                     }
                 });
             });
@@ -137,34 +399,14 @@ class ControladorAdminDashboard extends Controller
         $inicioMesAnterior = $hoy->copy()->subMonthNoOverflow()->startOfMonth();
         $finMesAnterior = $hoy->copy()->subMonthNoOverflow()->endOfMonth();
 
-        $orden = [
-            'Proximas citas' => 1,
-            'Citas de esta semana' => 2,
-            'Citas de la semana pasada' => 3,
-            'Citas del anterior mes' => 4,
-            'Citas anteriores' => 5,
-        ];
-
         return $citas->groupBy(function (Cita $cita) use ($inicioSemana, $finSemana, $inicioSemanaPasada, $finSemanaPasada, $inicioMesAnterior, $finMesAnterior) {
             $fecha = Carbon::parse($cita->fecha_cita);
-
-            if ($fecha->betweenIncluded($inicioSemana, $finSemana)) {
-                return 'Citas de esta semana';
-            }
-
-            if ($fecha->gt($finSemana)) {
-                return 'Proximas citas';
-            }
-
-            if ($fecha->betweenIncluded($inicioSemanaPasada, $finSemanaPasada)) {
-                return 'Citas de la semana pasada';
-            }
-
-            if ($fecha->betweenIncluded($inicioMesAnterior, $finMesAnterior)) {
-                return 'Citas del anterior mes';
-            }
-
+            if ($fecha->isToday()) return 'Citas de hoy';
+            if ($fecha->isFuture()) return 'Próximas citas';
+            if ($fecha->betweenIncluded($inicioSemana, $finSemana)) return 'Citas de esta semana';
+            if ($fecha->betweenIncluded($inicioSemanaPasada, $finSemanaPasada)) return 'Citas de la semana pasada';
+            if ($fecha->betweenIncluded($inicioMesAnterior, $finMesAnterior)) return 'Citas del anterior mes';
             return 'Citas anteriores';
-        })->sortBy(fn ($grupo, $nombre) => $orden[$nombre] ?? 99);
+        });
     }
 }

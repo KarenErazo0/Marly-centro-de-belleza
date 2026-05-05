@@ -300,3 +300,54 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const adminMenu = document.querySelector('[data-admin-menu]');
+    const adminMenuButton = document.querySelector('[data-admin-menu-button]');
+
+    adminMenuButton?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        adminMenu?.classList.toggle('abierto');
+    });
+
+    document.addEventListener('click', (event) => {
+        if (adminMenu && !adminMenu.contains(event.target)) {
+            adminMenu.classList.remove('abierto');
+        }
+    });
+
+    const abrirModal = (id) => {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        modal.classList.add('visible');
+        modal.setAttribute('aria-hidden', 'false');
+        const firstInput = modal.querySelector('input, select, textarea, button[type="submit"]');
+        setTimeout(() => firstInput?.focus(), 80);
+    };
+
+    const cerrarModal = (modal) => {
+        modal?.classList.remove('visible');
+        modal?.setAttribute('aria-hidden', 'true');
+    };
+
+    document.querySelectorAll('[data-open-modal]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const serviceId = button.getAttribute('data-service-id');
+            if (serviceId) {
+                const selector = document.getElementById('select-crear-trabajador-servicio');
+                if (selector) selector.value = serviceId;
+            }
+            abrirModal(button.getAttribute('data-open-modal'));
+        });
+    });
+
+    document.querySelectorAll('[data-close-modal], .admin-modal-backdrop').forEach((button) => {
+        button.addEventListener('click', () => cerrarModal(button.closest('.admin-modal')));
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            document.querySelectorAll('.admin-modal.visible').forEach(cerrarModal);
+        }
+    });
+});

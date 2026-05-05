@@ -24,8 +24,12 @@
             </div>
         </div>
 
+        @php
+            $heroImagen = $configuracion->hero_imagen ?: 'default-service.jpg';
+            $heroCarpeta = str_starts_with($heroImagen, 'hero-admin-') ? 'site' : 'services';
+        @endphp
         <div class="hero-imagen-salon hero-imagen-circular">
-            <img src="{{ asset('images/services/default-service.jpg') }}" alt="Salón Marly Centro de Belleza" onerror="this.onerror=null;this.src='{{ asset('images/services/manicure.jpg') }}';">
+            <img src="{{ asset('images/' . $heroCarpeta . '/' . $heroImagen) }}" alt="Salón Marly Centro de Belleza" onerror="this.onerror=null;this.src='{{ asset('images/services/default-service.jpg') }}';">
         </div>
     </div>
 </section>
@@ -142,20 +146,20 @@
     <div class="contenedor rejilla-contacto-mapa">
         <div class="tarjeta-informacion tarjeta-contacto-principal">
             <span class="etiqueta">Contacto y horarios</span>
-            <p><strong>Ubicación:</strong> Pasto, Nariño</p>
-            <p><strong>Teléfono:</strong> 7291317</p>
-            <p><strong>Correo:</strong> marly@centrobelleza.com</p>
-            <p><strong>Horario:</strong> lunes a viernes de 7:00 a.m. a 7:00 p.m. y sábados y festivos de 8:00 a.m. a 7:00 p.m.</p>
+            <p><strong>Ubicación:</strong> {{ $configuracion->contacto_ubicacion }}</p>
+            <p><strong>Teléfono:</strong> {{ $configuracion->contacto_telefono }}</p>
+            <p><strong>Correo:</strong> {{ $configuracion->contacto_correo }}</p>
+            <p><strong>Horario:</strong> {{ $configuracion->contacto_horario }}</p>
             <div class="redes-contacto">
                 <span class="titulo-redes">Nuestras redes sociales:</span>
-                <a href="https://www.instagram.com/marly.salon?igsh=eGhtNTZscnZ1cnR3" target="_blank" rel="noopener" aria-label="Instagram de Marly Centro de Belleza">
+                <a href="{{ $configuracion->instagram_url ?: 'https://www.instagram.com/' }}" target="_blank" rel="noopener" aria-label="Instagram de Marly Centro de Belleza">
                     <svg class="icono-red-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect x="3" y="3" width="18" height="18" rx="5"></rect>
                         <circle cx="12" cy="12" r="4"></circle>
                         <circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"></circle>
                     </svg> Instagram
                 </a>
-                <a href="https://wa.link/rsduzp" target="_blank" rel="noopener" aria-label="WhatsApp de Marly Centro de Belleza">
+                <a href="{{ $configuracion->whatsapp_url ?: 'https://wa.me/573000000000' }}" target="_blank" rel="noopener" aria-label="WhatsApp de Marly Centro de Belleza">
                     <svg class="icono-red-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M12.04 2.01A9.84 9.84 0 0 0 3.6 16.9L2.3 21.7l4.93-1.29a9.82 9.82 0 0 0 4.8 1.23h.01a9.82 9.82 0 0 0 0-19.63Zm0 17.96h-.01a8.16 8.16 0 0 1-4.16-1.14l-.3-.18-2.93.77.78-2.85-.2-.3A8.16 8.16 0 1 1 12.04 19.97Zm4.47-6.1c-.24-.12-1.45-.72-1.67-.8-.22-.08-.38-.12-.54.12-.16.24-.62.8-.76.96-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.95-1.2-.72-.64-1.2-1.43-1.35-1.67-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.39-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.16 1.52.1.46-.07 1.45-.59 1.65-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28Z"></path>
                     </svg> WhatsApp
