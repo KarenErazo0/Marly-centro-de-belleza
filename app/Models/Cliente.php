@@ -15,8 +15,10 @@ class Cliente extends Model
     protected $primaryKey = 'id_cliente';
 
     protected $fillable = [
+        'google_id',
         'nombre_completo',
         'correo_electronico',
+        'google_avatar',
         'telefono',
         'contrasena',
         'fecha_registro',

@@ -7,12 +7,16 @@ use App\Models\Cliente;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Laravel\Socialite\Facades\Socialite;
+use Throwable;
 
 class ControladorAutenticacionCliente extends Controller
 {
     private const ADMIN_EMAIL = 'admin@marly.com';
     private const ADMIN_PASSWORD = 'admin12345';
+
     public function mostrarRegistro(): View
     {
         return view('cliente.autenticacion.registro');
@@ -38,7 +42,7 @@ class ControladorAutenticacionCliente extends Controller
 
         $cliente = Cliente::create([
             'nombre_completo' => $validated['nombre_completo'],
-            'correo_electronico' => $validated['correo_electronico'],
+            'correo_electronico' => strtolower(trim($validated['correo_electronico'])),
             'telefono' => $validated['telefono'],
             'contrasena' => Hash::make($validated['contrasena']),
             'fecha_registro' => now(),
@@ -111,9 +115,72 @@ class ControladorAutenticacionCliente extends Controller
         return redirect()->route('cliente.cuenta')->with('success', 'Bienvenida de nuevo.');
     }
 
+    public function redirigirAGoogle(): RedirectResponse
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function procesarGoogleCallback(): RedirectResponse
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+
+            $correo = strtolower(trim($googleUser->getEmail()));
+
+            if ($correo === self::ADMIN_EMAIL) {
+                return redirect()
+                    ->route('cliente.ingresar')
+                    ->with('error', 'El acceso de administradora debe realizarse con correo y contraseña.');
+            }
+
+            $cliente = Cliente::where('google_id', $googleUser->getId())
+                ->orWhere('correo_electronico', $correo)
+                ->first();
+
+            if ($cliente) {
+                $cliente->update([
+                    'google_id' => $googleUser->getId(),
+                    'nombre_completo' => $cliente->nombre_completo ?: $googleUser->getName(),
+                    'correo_electronico' => $correo,
+                    'google_avatar' => $googleUser->getAvatar(),
+                ]);
+            } else {
+                $cliente = Cliente::create([
+                    'google_id' => $googleUser->getId(),
+                    'nombre_completo' => $googleUser->getName() ?: 'Cliente Marly',
+                    'correo_electronico' => $correo,
+                    'google_avatar' => $googleUser->getAvatar(),
+                    'telefono' => 'Pendiente',
+                    'contrasena' => Hash::make(Str::random(32)),
+                    'fecha_registro' => now(),
+                ]);
+            }
+
+            session()->forget(['admin_autenticado', 'admin_id', 'admin_nombre', 'admin_correo', 'reserva_cita']);
+            session()->put([
+                'cliente_id' => $cliente->id_cliente,
+                'cliente_nombre' => $cliente->nombre_completo,
+            ]);
+
+            return redirect()->route('cliente.cuenta')->with('success', 'Ingreso con Google realizado correctamente.');
+        } catch (Throwable $e) {
+            return redirect()
+                ->route('cliente.ingresar')
+                ->with('error', 'No se pudo iniciar sesión con Google. Inténtalo nuevamente.');
+        }
+    }
+
     public function salir(): RedirectResponse
     {
-        session()->forget(['cliente_id', 'cliente_nombre', 'admin_autenticado', 'admin_id', 'admin_nombre', 'admin_correo', 'reserva_cita']);
+        session()->forget([
+            'cliente_id',
+            'cliente_nombre',
+            'admin_autenticado',
+            'admin_id',
+            'admin_nombre',
+            'admin_correo',
+            'reserva_cita',
+        ]);
 
         return redirect()->route('inicio')->with('success', 'Sesión cerrada correctamente.');
     }

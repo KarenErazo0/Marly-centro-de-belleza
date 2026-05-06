@@ -3,13 +3,18 @@
     padding: 13px 22px; border-radius: 12px; font-weight: 600;
     border: 2px solid transparent; cursor: pointer; transition: .25s ease;
 }
+
 .boton-primario { background: var(--color-primario); color: #fff; }
 .boton-primario:hover { background: var(--color-primario-oscuro); }
+
 .boton-secundario { background: transparent; color: var(--color-primario); border-color: var(--color-primario); }
 .boton-secundario:hover { background: var(--color-primario); color: #fff; }
+
 .boton-peligro { background: #c4475c; color: #fff; }
 .boton-peligro:hover { background: #a8374a; }
+
 .boton-pequeno { padding: 10px 16px; font-size: .92rem; }
+
 .boton-servicio {
     display: inline-flex; align-items: center; gap: 8px; margin-top: 8px;
     padding: 12px 18px; border-radius: 12px;
@@ -17,10 +22,75 @@
     font-size: .92rem; font-weight: 600; box-shadow: 0 8px 20px rgba(183, 110, 121, .22);
     transition: all .3s ease;
 }
+
 .boton-servicio:hover {
     transform: translateY(-3px);
     box-shadow: 0 14px 28px rgba(183, 110, 121, .3);
     background: linear-gradient(135deg, #b76e79, #94545d);
 }
+
 .boton-servicio span { transition: transform .3s ease; }
 .boton-servicio:hover span { transform: translateX(4px); }
+
+.boton-google {
+    width: 100%;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 13px 20px;
+    margin: 18px 0;
+    border-radius: 14px;
+    border: 1px solid rgba(45, 45, 45, 0.14);
+    background: #ffffff;
+    color: #2f2f2f;
+    font-family: Arial, sans-serif;
+    font-size: 0.96rem;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: 0 10px 24px rgba(42, 31, 34, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.boton-google:hover {
+    transform: translateY(-2px);
+    border-color: rgba(183, 110, 121, 0.45);
+    box-shadow: 0 14px 30px rgba(42, 31, 34, 0.14);
+}
+
+.boton-google:active {
+    transform: translateY(0);
+    box-shadow: 0 8px 18px rgba(42, 31, 34, 0.1);
+}
+
+.icono-google-img {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.separador-autenticacion {
+    position: relative;
+    margin: 8px 0 20px;
+    text-align: center;
+    color: var(--color-texto-suave);
+    font-size: .9rem;
+}
+
+.separador-autenticacion::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(80, 60, 65, .14);
+}
+
+.separador-autenticacion span {
+    position: relative;
+    padding: 0 14px;
+    background: var(--color-fondo-tarjeta);
+}

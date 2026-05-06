@@ -32,8 +32,13 @@ Route::prefix('admin')->name('admin.')->middleware('admin.sesion')->group(functi
 Route::prefix('cliente')->name('cliente.')->group(function () {
     Route::get('/registro', [ControladorAutenticacionCliente::class, 'mostrarRegistro'])->name('registro');
     Route::post('/registro', [ControladorAutenticacionCliente::class, 'registrar'])->name('registro.guardar');
+
     Route::get('/ingresar', [ControladorAutenticacionCliente::class, 'mostrarIngreso'])->name('ingresar');
     Route::post('/ingresar', [ControladorAutenticacionCliente::class, 'ingresar'])->name('ingresar.validar');
+
+    Route::get('/google', [ControladorAutenticacionCliente::class, 'redirigirAGoogle'])->name('google.redirigir');
+    Route::get('/google/callback', [ControladorAutenticacionCliente::class, 'procesarGoogleCallback'])->name('google.callback');
+
     Route::post('/salir', [ControladorAutenticacionCliente::class, 'salir'])->name('salir');
 
     Route::middleware('cliente.sesion')->group(function () {
