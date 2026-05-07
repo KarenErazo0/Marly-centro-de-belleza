@@ -511,3 +511,592 @@
     .layout-horario-resumen, .tarjeta-confirmacion-doble { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) { .rejilla-trabajadores-compacta { grid-template-columns: 1fr; } }
+/* ===== Mis citas - rediseño cliente ===== */
+
+.seccion-mis-citas {
+    padding: 32px 0 48px !important;
+}
+
+.contenedor-mis-citas {
+    width: min(1120px, 94%) !important;
+}
+
+.encabezado-mis-citas {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    margin-bottom: 28px !important;
+}
+
+.encabezado-mis-citas h1 {
+    margin: 0 0 6px !important;
+    font-size: 1.85rem !important;
+    line-height: 1.1 !important;
+    color: #1f2328 !important;
+    font-weight: 800 !important;
+}
+
+.encabezado-mis-citas p {
+    margin: 0 !important;
+    color: #6d7280 !important;
+    font-size: .98rem !important;
+}
+
+.boton-agendar-cita {
+    min-height: 46px !important;
+    padding: 0 24px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, #c99624, #d1a93f) !important;
+    color: #fff !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    font-size: .94rem !important;
+    font-weight: 700 !important;
+    box-shadow: 0 14px 28px rgba(193, 142, 31, .22) !important;
+}
+
+.boton-agendar-cita span {
+    font-size: 1.35rem !important;
+    line-height: 1 !important;
+    font-weight: 400 !important;
+}
+
+.barra-busqueda-mis-citas {
+    width: 100% !important;
+    padding: 16px 18px !important;
+    border-radius: 13px !important;
+    background: #fff !important;
+    border: 1px solid rgba(210, 196, 178, .65) !important;
+    box-shadow: 0 12px 32px rgba(34, 26, 18, .07) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    margin-bottom: 32px !important;
+}
+
+.campo-busqueda-citas {
+    flex: 1 !important;
+    min-height: 46px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(210, 196, 178, .75) !important;
+    background: #fffdfb !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 0 18px !important;
+}
+
+.campo-busqueda-citas svg {
+    width: 19px !important;
+    height: 19px !important;
+    color: #8f939b !important;
+    flex: 0 0 19px !important;
+}
+
+.campo-busqueda-citas input {
+    width: 100% !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    color: #343942 !important;
+    font-size: .92rem !important;
+    padding: 0 !important;
+}
+
+.campo-busqueda-citas input::placeholder {
+    color: #8a8f98 !important;
+}
+
+.barra-busqueda-mis-citas .boton {
+    min-height: 46px !important;
+    padding: 0 30px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, #c99624, #d1a93f) !important;
+    color: #fff !important;
+    border: none !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+.grupos-mis-citas {
+    display: grid !important;
+    gap: 28px !important;
+}
+
+.grupo-mis-citas {
+    display: grid !important;
+    gap: 14px !important;
+}
+
+.header-mis-citas {
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
+}
+
+.header-mis-citas h2 {
+    margin: 0 !important;
+    color: #1f2328 !important;
+    font-size: 1.35rem !important;
+    font-weight: 800 !important;
+}
+
+.header-mis-citas > span {
+    color: #c99624 !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+}
+
+.linea-titulo-citas {
+    display: block !important;
+    width: 42px !important;
+    height: 3px !important;
+    border-radius: 999px !important;
+    background: #c99624 !important;
+    margin-top: 7px !important;
+}
+
+.rejilla-mis-citas {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 26px !important;
+}
+
+.grupo-mis-citas:nth-child(n + 2) .rejilla-mis-citas {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 22px !important;
+}
+
+.tarjeta-mis-citas {
+    position: relative !important;
+    min-height: 260px !important;
+    padding: 22px 24px 18px !important;
+    border-radius: 13px !important;
+    background: #fff !important;
+    border: 1px solid rgba(210, 196, 178, .65) !important;
+    box-shadow: 0 12px 30px rgba(26, 22, 18, .08) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+}
+
+.tarjeta-mis-citas .menu-cita-cliente {
+    position: absolute !important;
+    top: 20px !important;
+    right: 20px !important;
+    z-index: 5 !important;
+}
+
+.tarjeta-mis-citas .boton-menu-cita {
+    min-width: 50px !important;
+    min-height: 37px !important;
+    border-radius: 999px !important;
+    border: none !important;
+    background: rgb(201, 166, 70) !important;
+    color: #fff5d2 !important;
+    font-size: 1.25rem !important;  
+    letter-spacing: 1.5px !important;
+    cursor: pointer !important;
+}
+
+.tarjeta-mis-citas .boton-menu-cita:hover {
+    background: #f6f0e5 !important;
+}
+
+.tarjeta-mis-citas .opciones-menu-cita {
+    right: 0 !important;
+    top: 34px !important;
+}
+
+.tarjeta-mis-citas .tarjeta-cita-encabezado {
+    display: grid !important;
+    gap: 14px !important;
+    padding-right: 46px !important;
+}
+
+.tarjeta-mis-citas .estado-cita {
+    width: fit-content !important;
+    margin: 0 !important;
+    padding: 7px 15px !important;
+    border-radius: 999px !important;
+    font-size: .78rem !important;
+    font-weight: 800 !important;
+}
+
+.tarjeta-mis-citas .estado-pendiente {
+    background: #fbf1d8 !important;
+    color: #c99624 !important;
+}
+
+.tarjeta-mis-citas .estado-cancelada {
+    background: #ececec !important;
+    color: #5f6368 !important;
+}
+
+.tarjeta-mis-citas .estado-completada {
+    background: #dff6e7 !important;
+    color: #2f9a5f !important;
+}
+
+.tarjeta-mis-citas .estado-inasistencia {
+    background: #ffe0e6 !important;
+    color: #e05265 !important;
+}
+
+.tarjeta-mis-citas .estado-pasada {
+    background: #f8efd8 !important;
+    color: #b98727 !important;
+}
+
+.tarjeta-mis-citas h3 {
+    margin: 0 !important;
+    color: #222831 !important;
+    font-size: 1.16rem !important;
+    line-height: 1.35 !important;
+    font-weight: 800 !important;
+}
+
+.detalle-mis-citas {
+    display: grid !important;
+    gap: 10px !important;
+}
+
+.detalle-mis-citas p {
+    margin: 0 !important;
+    display: grid !important;
+    grid-template-columns: 18px auto 1fr !important;
+    align-items: center !important;
+    gap: 10px !important;
+    color: #5d6470 !important;
+    font-size: .86rem !important;
+    line-height: 1.35 !important;
+}
+
+.detalle-mis-citas svg {
+    width: 17px !important;
+    height: 17px !important;
+    color: #5f6368 !important;
+}
+
+.detalle-mis-citas strong {
+    color: #4c535e !important;
+    font-weight: 800 !important;
+}
+
+.detalle-mis-citas span {
+    color: #59616d !important;
+}
+
+.footer-tarjeta-cita {
+    margin-top: auto !important;
+    padding-top: 15px !important;
+    border-top: 1px solid rgba(210, 196, 178, .6) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 18px !important;
+    flex-wrap: wrap !important;
+}
+
+.footer-tarjeta-cita p {
+    margin: 0 !important;
+    color: #5d6470 !important;
+    font-size: .82rem !important;
+}
+
+.footer-tarjeta-cita strong {
+    color: #4c535e !important;
+    font-weight: 800 !important;
+}
+
+.footer-tarjeta-cita > span {
+    width: 1px !important;
+    height: 14px !important;
+    background: rgba(120, 120, 120, .35) !important;
+}
+
+.aviso-mis-citas {
+    margin-top: 24px !important;
+    padding: 16px 20px !important;
+    border-radius: 13px !important;
+    background: #fffaf4 !important;
+    border: 1px solid rgba(210, 196, 178, .65) !important;
+    box-shadow: 0 10px 26px rgba(26, 22, 18, .06) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+
+.icono-aviso-citas {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 50% !important;
+    background: #c99624 !important;
+    color: #fff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-family: Georgia, serif !important;
+    font-size: 1.35rem !important;
+    font-weight: 800 !important;
+    flex: 0 0 38px !important;
+}
+
+.aviso-mis-citas strong {
+    display: block !important;
+    margin-bottom: 3px !important;
+    color: #343942 !important;
+    font-size: .92rem !important;
+}
+
+.aviso-mis-citas p {
+    margin: 0 !important;
+    color: #6d7280 !important;
+    font-size: .86rem !important;
+}
+
+.tarjeta-vacia-mis-citas {
+    border-radius: 13px !important;
+    box-shadow: 0 12px 30px rgba(26, 22, 18, .07) !important;
+}
+
+@media (max-width: 980px) {
+    .rejilla-mis-citas,
+    .grupo-mis-citas:nth-child(n + 2) .rejilla-mis-citas {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 680px) {
+    .encabezado-mis-citas {
+        flex-direction: column !important;
+    }
+
+    .boton-agendar-cita {
+        width: 100% !important;
+    }
+
+    .barra-busqueda-mis-citas {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .campo-busqueda-citas {
+        width: 100% !important;
+    }
+
+    .barra-busqueda-mis-citas .boton {
+        width: 100% !important;
+    }
+
+    .footer-tarjeta-cita {
+        display: grid !important;
+        gap: 8px !important;
+    }
+
+    .footer-tarjeta-cita > span {
+        display: none !important;
+    }
+}
+
+/* ===== Corrección modo oscuro - Reservas y Mis citas ===== */
+
+html[data-theme="dark"] .seccion-reservas,
+html[data-theme="dark"] .seccion-mis-citas {
+    background: #171717 !important;
+    color: #f4f1eb !important;
+}
+
+html[data-theme="dark"] .encabezado-mis-citas h1,
+html[data-theme="dark"] .header-mis-citas h2,
+html[data-theme="dark"] .tarjeta-mis-citas h3,
+html[data-theme="dark"] .contenido-servicio-reserva h3,
+html[data-theme="dark"] .contenido-trabajador h3,
+html[data-theme="dark"] .resumen-horario-vivo h3,
+html[data-theme="dark"] .resumen-confirmacion-pequeno h3,
+html[data-theme="dark"] .grupo-seleccion-horario h3,
+html[data-theme="dark"] .resumen-cita-final h3,
+html[data-theme="dark"] .resumen-cita-final strong,
+html[data-theme="dark"] .rejilla-resumen-final strong,
+html[data-theme="dark"] .fecha-cita-registrada strong {
+    color: #f7f1e6 !important;
+}
+
+html[data-theme="dark"] .encabezado-mis-citas p,
+html[data-theme="dark"] .detalle-mis-citas p,
+html[data-theme="dark"] .detalle-mis-citas span,
+html[data-theme="dark"] .detalle-cita-grid p,
+html[data-theme="dark"] .footer-tarjeta-cita p,
+html[data-theme="dark"] .aviso-mis-citas p,
+html[data-theme="dark"] .contenido-trabajador p,
+html[data-theme="dark"] .resumen-horario-vivo p,
+html[data-theme="dark"] .resumen-confirmacion-pequeno p,
+html[data-theme="dark"] .dia-semana,
+html[data-theme="dark"] .mensaje-sin-horas,
+html[data-theme="dark"] .rejilla-resumen-final span,
+html[data-theme="dark"] .fecha-cita-registrada span {
+    color: #cfc7ba !important;
+}
+
+html[data-theme="dark"] .detalle-mis-citas strong,
+html[data-theme="dark"] .footer-tarjeta-cita strong,
+html[data-theme="dark"] .aviso-mis-citas strong {
+    color: #f1e7d8 !important;
+}
+
+html[data-theme="dark"] .barra-busqueda-mis-citas,
+html[data-theme="dark"] .tarjeta-mis-citas,
+html[data-theme="dark"] .tarjeta-servicio-reserva,
+html[data-theme="dark"] .tarjeta-trabajador,
+html[data-theme="dark"] .tarjeta-cita-registrada,
+html[data-theme="dark"] .tarjeta-reserva-vacia,
+html[data-theme="dark"] .tarjeta-horario,
+html[data-theme="dark"] .tarjeta-confirmacion-reserva,
+html[data-theme="dark"] .panel-selector-horario,
+html[data-theme="dark"] .resumen-horario-vivo,
+html[data-theme="dark"] .resumen-confirmacion-pequeno,
+html[data-theme="dark"] .encabezado-area-profesional.limpio {
+    background: #202020 !important;
+    border-color: rgba(201, 166, 70, .28) !important;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .35) !important;
+}
+
+html[data-theme="dark"] .campo-busqueda-citas,
+html[data-theme="dark"] .item-fecha,
+html[data-theme="dark"] .item-hora,
+html[data-theme="dark"] .badge-calificacion,
+html[data-theme="dark"] .aviso-precio {
+    background: #181818 !important;
+    border-color: rgba(201, 166, 70, .32) !important;
+    color: #f4f1eb !important;
+}
+
+html[data-theme="dark"] .campo-busqueda-citas input {
+    color: #f4f1eb !important;
+}
+
+html[data-theme="dark"] .campo-busqueda-citas input::placeholder {
+    color: #9f978c !important;
+}
+
+html[data-theme="dark"] .campo-busqueda-citas svg,
+html[data-theme="dark"] .detalle-mis-citas svg {
+    color: #d7bd6f !important;
+}
+
+html[data-theme="dark"] .paso-reserva {
+    background: rgba(201, 166, 70, .14) !important;
+    color: #e5d7b4 !important;
+}
+
+html[data-theme="dark"] .paso-reserva.activo,
+html[data-theme="dark"] .boton-degradado,
+html[data-theme="dark"] .boton-aleatorio,
+html[data-theme="dark"] .boton-agendar-cita,
+html[data-theme="dark"] .barra-busqueda-mis-citas .boton {
+    background: linear-gradient(135deg, #c99624, #d1a93f) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .paso-reserva.completado,
+html[data-theme="dark"] .contador-servicios,
+html[data-theme="dark"] .chip-servicio,
+html[data-theme="dark"] .contador-profesionales-area,
+html[data-theme="dark"] .resumen-texto-multiple,
+html[data-theme="dark"] .boton-seleccion-servicio,
+html[data-theme="dark"] .resumen-agendamiento-top,
+html[data-theme="dark"] .resumen-cita-previa,
+html[data-theme="dark"] .resumen-cita-final,
+html[data-theme="dark"] .aviso-mis-citas,
+html[data-theme="dark"] .aviso-horario-salon {
+    background: #221f1a !important;
+    border-color: rgba(201, 166, 70, .28) !important;
+    color: #e5d7b4 !important;
+}
+
+html[data-theme="dark"] .item-fecha.seleccionado,
+html[data-theme="dark"] .item-hora.seleccionado,
+html[data-theme="dark"] .tarjeta-servicio-reserva.seleccionado,
+html[data-theme="dark"] .tarjeta-trabajador.seleccionado {
+    background: rgba(201, 166, 70, .16) !important;
+    border-color: #d1a93f !important;
+    color: #f7f1e6 !important;
+    box-shadow: 0 12px 26px rgba(0, 0, 0, .35) !important;
+}
+
+html[data-theme="dark"] .tarjeta-mis-citas .boton-menu-cita {
+    background: rgb(201, 166, 70)!important;
+    color: rgb(52, 52, 52) !important;
+}
+
+html[data-theme="dark"] .tarjeta-mis-citas .boton-menu-cita:hover {
+    background: rgba(201, 166, 70, .14) !important;
+}
+
+html[data-theme="dark"] .opciones-menu-cita {
+    background: #242424 !important;
+    border-color: rgba(201, 166, 70, .30) !important;
+    box-shadow: 0 18px 35px rgba(0, 0, 0, .45) !important;
+}
+
+html[data-theme="dark"] .opciones-menu-cita a,
+html[data-theme="dark"] .opciones-menu-cita button {
+    color: #f4f1eb !important;
+}
+
+html[data-theme="dark"] .opciones-menu-cita a:hover,
+html[data-theme="dark"] .opciones-menu-cita button:hover {
+    background: rgba(201, 166, 70, .14) !important;
+}
+
+html[data-theme="dark"] .footer-tarjeta-cita,
+html[data-theme="dark"] .linea-resumen {
+    border-top-color: #2b2b2b !important;
+    background-color: #343434 !important;
+}
+
+html[data-theme="dark"] .footer-tarjeta-cita > span {
+    background: rgba(255, 255, 255, .22) !important;
+}
+
+html[data-theme="dark"] .estado-pendiente {
+    background: rgba(201, 166, 70, .18) !important;
+    color: #e6c76b !important;
+}
+
+html[data-theme="dark"] .estado-cancelada {
+    background: rgba(255, 255, 255, .10) !important;
+    color: #d8d8d8 !important;
+}
+
+html[data-theme="dark"] .estado-completada {
+    background: rgba(47, 154, 95, .20) !important;
+    color: #8ee3ad !important;
+}
+
+html[data-theme="dark"] .estado-inasistencia {
+    background: rgba(224, 82, 101, .18) !important;
+    color: #ff9aaa !important;
+}
+
+html[data-theme="dark"] .estado-pasada {
+    background: rgba(185, 135, 39, .18) !important;
+    color: #e3c16d !important;
+}
+
+html[data-theme="dark"] .linea-titulo-citas {
+    background: #d7bd6f !important;
+}
+
+html[data-theme="dark"] .header-mis-citas > span,
+html[data-theme="dark"] .especialidad,
+html[data-theme="dark"] .encabezado-area-profesional h3,
+html[data-theme="dark"] .grupo-seleccion-horario h3 {
+    color: #d7bd6f !important;
+}

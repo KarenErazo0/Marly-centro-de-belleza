@@ -216,3 +216,475 @@
     .hero-imagen-salon, .hero-imagen-salon img { min-height: 360px; }
     .rejilla-mision-vision, .rejilla-contacto-mapa { grid-template-columns: 1fr; }
 }
+/* HERO INICIO MARLY - estilos exactos y aislados */
+.marly-home-hero-exacto {
+    padding: 96px 0 78px !important;
+}
+
+.marly-home-hero-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 500px) !important;
+    align-items: center !important;
+    gap: 72px !important;
+}
+
+.marly-home-hero-contenido {
+    min-width: 0 !important;
+}
+
+.marly-home-hero-etiqueta {
+    display: inline-flex !important;
+    align-items: center !important;
+    border-radius: 999px !important;
+    padding: 10px 18px !important;
+    font-weight: 800 !important;
+}
+
+.marly-home-agenda-card {
+    max-width: 620px !important;
+    margin-top: 28px !important;
+    padding: 26px 28px !important;
+    border-radius: 22px !important;
+}
+
+.marly-home-agenda-titulo {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    margin: 0 0 12px !important;
+    font-size: 1.16rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-home-icono-calendario {
+    width: 30px !important;
+    height: 30px !important;
+    color: var(--color-primario) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 30px !important;
+}
+
+.marly-home-icono-calendario svg,
+.marly-home-icono-usuario svg {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+}
+
+.marly-home-agenda-acciones {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    flex-wrap: wrap !important;
+    margin-top: 22px !important;
+}
+
+.marly-home-btn-hero {
+    min-width: 170px !important;
+    min-height: 54px !important;
+    padding: 14px 24px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 18px !important;
+    font-weight: 800 !important;
+}
+
+.marly-home-icono-flecha {
+    font-size: 1.55rem !important;
+    line-height: 1 !important;
+    transform: translateY(-1px) !important;
+}
+
+.marly-home-icono-usuario {
+    width: 24px !important;
+    height: 24px !important;
+    display: inline-flex !important;
+    color: currentColor !important;
+    flex: 0 0 24px !important;
+}
+
+.marly-home-hero-imagen {
+    width: 100% !important;
+    max-width: 500px !important;
+    aspect-ratio: 1 / 1 !important;
+    height: auto !important;
+    min-height: auto !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    justify-self: center !important;
+    border: 2px solid var(--color-primario) !important;
+}
+
+.marly-home-hero-imagen img {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: auto !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+}
+
+@media (max-width: 900px) {
+    .marly-home-hero-grid {
+        grid-template-columns: 1fr !important;
+        gap: 42px !important;
+        text-align: center !important;
+    }
+
+    .marly-home-agenda-card {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .marly-home-agenda-titulo,
+    .marly-home-agenda-acciones {
+        justify-content: center !important;
+    }
+
+    .marly-home-hero-imagen {
+        max-width: 360px !important;
+    }
+}
+/* SOBRE NOSOTROS - diseño exacto y aislado */
+.marly-sobre-exacto {
+    padding: 72px 0 !important;
+    background: #fbf8f1 !important;
+}
+
+.marly-sobre-layout {
+    display: grid !important;
+    grid-template-columns: minmax(320px, 520px) minmax(0, 1fr) !important;
+    gap: 22px !important;
+    align-items: stretch !important;
+}
+
+.marly-sobre-carrusel {
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 100% !important;
+    align-self: stretch !important;
+    border-radius: 26px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    box-shadow: 0 18px 38px rgba(45, 32, 36, .12) !important;
+}
+
+.marly-sobre-carrusel .carrusel-ventana,
+.marly-sobre-carrusel .slide-sobre,
+.marly-sobre-carrusel img {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.marly-sobre-carrusel img {
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+}
+
+.marly-sobre-control {
+    width: 54px !important;
+    height: 54px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, .94) !important;
+    color: var(--color-primario) !important;
+    border: none !important;
+    font-size: 2.2rem !important;
+    font-weight: 500 !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .12) !important;
+}
+
+
+.marly-sobre-bloque {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 22px !important;
+    height: 100% !important;
+}
+
+.marly-sobre-card {
+    flex: 1 !important;
+    padding: 36px 34px !important;
+    border-radius: 26px !important;
+    background: rgba(255, 255, 255, .94) !important;
+    border: 1px solid rgba(201, 166, 70, .22) !important;
+    box-shadow: 0 14px 32px rgba(45, 32, 36, .08) !important;
+}
+
+.marly-sobre-card-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 22px !important;
+    margin-bottom: 20px !important;
+}
+
+.marly-sobre-icono {
+    width: 62px !important;
+    height: 62px !important;
+    border-radius: 50% !important;
+    background: #fff !important;
+    color: var(--color-primario) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 62px !important;
+    box-shadow: 0 10px 24px rgba(45, 32, 36, .08) !important;
+}
+
+.marly-sobre-icono svg {
+    width: 30px !important;
+    height: 30px !important;
+}
+
+.marly-sobre-card h3 {
+    margin: 0 !important;
+    font-size: 1.55rem !important;
+    font-weight: 800 !important;
+    color: var(--color-texto) !important;
+}
+
+.marly-sobre-sublinea {
+    display: block !important;
+    width: 38px !important;
+    height: 3px !important;
+    margin-top: 12px !important;
+    border-radius: 999px !important;
+    background: var(--color-primario) !important;
+}
+
+.marly-sobre-card p {
+    margin: 0 !important;
+    font-size: 1rem !important;
+    line-height: 1.85 !important;
+    color: var(--color-texto-suave) !important;
+}
+
+@media (max-width: 992px) {
+    .marly-sobre-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .marly-sobre-carrusel {
+        height: 420px !important;
+        min-height: 420px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .marly-sobre-exacto {
+        padding: 52px 0 !important;
+    }
+
+    .marly-sobre-carrusel {
+        height: 340px !important;
+        min-height: 340px !important;
+    }
+
+    .marly-sobre-card {
+        padding: 28px 24px !important;
+    }
+
+    .marly-sobre-card-header {
+        gap: 16px !important;
+    }
+
+    .marly-sobre-icono {
+        width: 54px !important;
+        height: 54px !important;
+        flex-basis: 54px !important;
+    }
+}
+.marly-sobre-layout {
+    align-items: stretch !important;
+}
+/* CONTACTO Y HORARIOS - diseño exacto y aislado */
+.marly-contacto-exacto {
+    padding: 70px 0 !important;
+    background: #fbf8f1 !important;
+}
+
+.marly-contacto-layout {
+    display: grid !important;
+    grid-template-columns: minmax(330px, 430px) minmax(0, 1fr) !important;
+    gap: 100px !important;
+    align-items: stretch !important;
+}
+
+.marly-contacto-card {
+    min-height: 420px !important;
+    min-width: 480px !important;
+    padding: 28px 30px !important;
+    border-radius: 26px !important;
+    background: rgba(255, 255, 255, .96) !important;
+    border: 1px solid rgba(201, 166, 70, .22) !important;
+    box-shadow: 0 18px 38px rgba(45, 32, 36, .08) !important;
+}
+
+.marly-contacto-etiqueta {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 11px 17px !important;
+    margin-bottom: 22px !important;
+    border-radius: 999px !important;
+    background: rgba(201, 166, 70, .13) !important;
+    color: var(--color-primario) !important;
+    font-size: .98rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-contacto-etiqueta-icono {
+    width: 21px !important;
+    height: 21px !important;
+    display: inline-flex !important;
+}
+
+.marly-contacto-etiqueta-icono svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.marly-contacto-lista {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 17px !important;
+}
+
+.marly-contacto-item {
+    display: grid !important;
+    grid-template-columns: 24px 1fr !important;
+    gap: 15px !important;
+    align-items: flex-start !important;
+    margin: 0 !important;
+    color: var(--color-texto-suave) !important;
+    font-size: .98rem !important;
+    line-height: 1.65 !important;
+}
+
+.marly-contacto-item strong {
+    color: var(--color-texto) !important;
+    font-weight: 800 !important;
+}
+
+.marly-contacto-icono {
+    width: 22px !important;
+    height: 22px !important;
+    margin-top: 2px !important;
+    color: var(--color-primario) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.marly-contacto-icono svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.marly-contacto-separador {
+    width: 100% !important;
+    height: 1px !important;
+    margin: 24px 0 18px !important;
+    background: rgba(201, 166, 70, .22) !important;
+}
+
+.marly-contacto-redes-titulo {
+    margin: 0 0 16px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    color: var(--color-texto) !important;
+}
+
+.marly-contacto-redes {
+    display: flex !important;
+    gap: 18px !important;
+    flex-wrap: wrap !important;
+    margin-top: 0 !important;
+}
+
+.marly-contacto-red-btn {
+    min-width: 150px !important;
+    min-height: 52px !important;
+    padding: 12px 22px !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    border: 1.5px solid rgba(201, 166, 70, .45) !important;
+    color: var(--color-primario) !important;
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    box-shadow: 0 8px 18px rgba(45, 32, 36, .04) !important;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease !important;
+}
+
+.marly-contacto-red-btn:hover {
+    transform: translateY(-2px) !important;
+    background: rgba(201, 166, 70, .08) !important;
+    box-shadow: 0 12px 24px rgba(45, 32, 36, .08) !important;
+}
+
+.marly-contacto-red-icono {
+    width: 24px !important;
+    height: 24px !important;
+    display: inline-flex !important;
+    color: currentColor !important;
+}
+
+.marly-contacto-red-icono svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.marly-contacto-mapa {
+    min-height: 430px !important;
+    border-radius: 26px !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    border: 1px solid rgba(201, 166, 70, .22) !important;
+    box-shadow: 0 18px 38px rgba(45, 32, 36, .08) !important;
+}
+
+.marly-contacto-mapa iframe {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 430px !important;
+    border: 0 !important;
+    display: block !important;
+}
+
+@media (max-width: 992px) {
+    .marly-contacto-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .marly-contacto-card,
+    .marly-contacto-mapa,
+    .marly-contacto-mapa iframe {
+        min-height: 390px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .marly-contacto-exacto {
+        padding: 52px 0 !important;
+    }
+
+    .marly-contacto-card {
+        padding: 26px 22px !important;
+    }
+
+    .marly-contacto-redes {
+        gap: 12px !important;
+    }
+
+    .marly-contacto-red-btn {
+        width: 100% !important;
+    }
+}

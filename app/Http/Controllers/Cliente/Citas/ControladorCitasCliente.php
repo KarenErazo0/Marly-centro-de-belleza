@@ -17,6 +17,8 @@ use Illuminate\View\View;
 class ControladorCitasCliente extends Controller
 {
     private const SESSION_KEY = 'reserva_cita';
+    private const TIMEZONE = 'America/Bogota';
+    private const MINUTOS_ANTELACION = 30;
 
     public function index(Request $request): View
     {
@@ -262,7 +264,7 @@ class ControladorCitasCliente extends Controller
         }
 
         $duracionTotal = (int) $servicios->sum('duracion_minutos');
-        $inicio = Carbon::createFromFormat('Y-m-d H:i', $reserva['fecha'] . ' ' . $reserva['hora']);
+        $inicio = Carbon::createFromFormat('Y-m-d H:i', $reserva['fecha'] . ' ' . $reserva['hora'], self::TIMEZONE);
         $fin = $inicio->copy()->addMinutes($duracionTotal);
         $gruposSeleccionados = $this->getGruposSeleccionados($servicios, $trabajadores);
         $trabajadorPrincipal = $trabajadores->first();
@@ -279,7 +281,7 @@ class ControladorCitasCliente extends Controller
                 'duracion_total_minutos' => $duracionTotal,
                 'notas' => $validated['notas'] ?? null,
                 'estado' => 'registrada',
-                'fecha_registro' => now(),
+                'fecha_registro' => now(self::TIMEZONE),
             ]);
 
             $cita->servicios()->sync($servicios->pluck('id_servicio')->all());
@@ -361,7 +363,7 @@ class ControladorCitasCliente extends Controller
             return back()->withInput()->with('error', 'La hora seleccionada no está disponible.');
         }
 
-        $inicio = Carbon::createFromFormat('Y-m-d H:i', $validated['fecha'] . ' ' . $validated['hora']);
+        $inicio = Carbon::createFromFormat('Y-m-d H:i', $validated['fecha'] . ' ' . $validated['hora'], self::TIMEZONE);
         $fin = $inicio->copy()->addMinutes((int) $cita->duracion_total_minutos);
 
         $cita->update([
@@ -397,14 +399,14 @@ class ControladorCitasCliente extends Controller
             return false;
         }
 
-        $inicio = Carbon::createFromFormat('Y-m-d H:i:s', $cita->fecha_cita . ' ' . $cita->hora_inicio);
+        $inicio = Carbon::createFromFormat('Y-m-d H:i:s', $cita->fecha_cita . ' ' . $cita->hora_inicio, self::TIMEZONE);
 
-        return $inicio->isFuture();
+        return $inicio->gt(now(self::TIMEZONE));
     }
 
     private function agruparCitasPorTiempo(Collection $citas): Collection
     {
-        $hoy = Carbon::today();
+        $hoy = Carbon::today(self::TIMEZONE);
         $inicioSemana = $hoy->copy()->startOfWeek(Carbon::MONDAY);
         $finSemana = $hoy->copy()->endOfWeek(Carbon::SUNDAY);
         $inicioSemanaPasada = $inicioSemana->copy()->subWeek();
@@ -421,7 +423,7 @@ class ControladorCitasCliente extends Controller
         ];
 
         return $citas->groupBy(function (Cita $cita) use ($hoy, $inicioSemana, $finSemana, $inicioSemanaPasada, $finSemanaPasada, $inicioMesAnterior, $finMesAnterior) {
-            $fecha = Carbon::parse($cita->fecha_cita);
+            $fecha = Carbon::parse($cita->fecha_cita, self::TIMEZONE);
 
             if ($fecha->betweenIncluded($inicioSemana, $finSemana)) {
                 return 'Citas de esta semana';
@@ -478,7 +480,6 @@ class ControladorCitasCliente extends Controller
         }
 
         return Trabajador::whereIn('id_trabajador', $ids)
-            ->orderByDesc('calificacion')
             ->orderBy('nombre_completo')
             ->get();
     }
@@ -487,12 +488,10 @@ class ControladorCitasCliente extends Controller
     {
         return $this->agruparServiciosPorArea($servicios)->map(function (Collection $serviciosGrupo, string $area) {
             $ids = $serviciosGrupo->pluck('id_servicio')->all();
-            $trabajadores = Trabajador::with('servicios')
-                ->where('estado', 'activo')
+            $trabajadores = Trabajador::where('estado', 'activo')
                 ->whereHas('servicios', function ($query) use ($ids) {
                     $query->whereIn('servicios.id_servicio', $ids);
                 })
-                ->orderByDesc('calificacion')
                 ->orderBy('nombre_completo')
                 ->get()
                 ->unique('id_trabajador')
@@ -565,7 +564,7 @@ class ControladorCitasCliente extends Controller
     private function buildDiasDisponibles(Collection $trabajadores, Collection $servicios, int $cantidadDias): Collection
     {
         $dias = collect();
-        $fecha = Carbon::today();
+        $fecha = Carbon::today(self::TIMEZONE);
 
         while ($dias->count() < $cantidadDias) {
             if (! $fecha->isSunday()) {
@@ -588,7 +587,7 @@ class ControladorCitasCliente extends Controller
 
     private function buildHorasDisponibles(Collection $trabajadores, Collection $servicios, string $fecha, ?int $ignorarCitaId = null): Collection
     {
-        $fechaCarbon = Carbon::parse($fecha);
+        $fechaCarbon = Carbon::parse($fecha, self::TIMEZONE);
         if ($fechaCarbon->isSunday()) {
             return collect();
         }
@@ -607,15 +606,21 @@ class ControladorCitasCliente extends Controller
 
         $horas = collect();
         $slot = $apertura->copy();
+        $fechaHoraMinimaReserva = now(self::TIMEZONE)->addMinutes(self::MINUTOS_ANTELACION);
 
         while ($slot->copy()->addMinutes($duracionTotal)->lte($cierre)) {
+            if ($slot->lt($fechaHoraMinimaReserva)) {
+                $slot->addMinutes(60);
+                continue;
+            }
+
             $finSlot = $slot->copy()->addMinutes($duracionTotal);
             $ocupado = $trabajadores->contains(function (Trabajador $trabajador) use ($citasPorTrabajador, $fechaCarbon, $slot, $finSlot) {
                 $citas = $citasPorTrabajador->get($trabajador->id_trabajador, collect());
 
                 return $citas->contains(function ($cita) use ($fechaCarbon, $slot, $finSlot) {
-                    $inicioCita = Carbon::createFromFormat('Y-m-d H:i:s', $fechaCarbon->format('Y-m-d') . ' ' . $cita->hora_inicio);
-                    $finCita = Carbon::createFromFormat('Y-m-d H:i:s', $fechaCarbon->format('Y-m-d') . ' ' . $cita->hora_fin);
+                    $inicioCita = Carbon::createFromFormat('Y-m-d H:i:s', $fechaCarbon->format('Y-m-d') . ' ' . $cita->hora_inicio, self::TIMEZONE);
+                    $finCita = Carbon::createFromFormat('Y-m-d H:i:s', $fechaCarbon->format('Y-m-d') . ' ' . $cita->hora_fin, self::TIMEZONE);
 
                     return $slot->lt($finCita) && $finSlot->gt($inicioCita);
                 });

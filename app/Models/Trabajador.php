@@ -18,9 +18,6 @@ class Trabajador extends Model
     protected $fillable = [
         'nombre_completo',
         'especialidad',
-        'anios_experiencia',
-        'total_resenas',
-        'calificacion',
         'foto',
         'estado',
     ];

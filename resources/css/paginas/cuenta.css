@@ -1,25 +1,538 @@
-.seccion-cuenta { padding: 72px 0; }
-.rejilla-cuenta { display: grid; gap: 24px; }
-.tarjeta-cuenta {
-    background: #fff; border: 1px solid var(--color-borde); border-radius: 24px;
-    padding: 30px; box-shadow: var(--sombra-suave);
+/* MI CUENTA MARLY */
+.seccion-cuenta,
+.marly-cuenta-exacto {
+    padding: 56px 0 !important;
+    background: #ffffff !important;
 }
-.bienvenida-cuenta p, .tarjeta-cuenta p { color: var(--color-texto-suave); line-height: 1.7; }
-.tarjeta-cuenta h1, .tarjeta-cuenta h2 { margin-top: 0; color: #2d2024; }
-.tarjeta-eliminar { border-color: #f0c5cd; background: #fff7f8; }
-.bloque-sesion { margin-top: 22px; }
 
-.acciones-panel-cliente {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-    align-items: stretch;
-    margin-top: 22px;
+.marly-cuenta-contenedor {
+    max-width: 980px !important;
+    display: grid !important;
+    gap: 18px !important;
 }
-.acciones-panel-cliente .boton,
-.acciones-panel-cliente form,
-.acciones-panel-cliente form .boton { width: 100%; }
-.panel-edicion-cuenta { display: none; }
-.panel-edicion-cuenta.visible { display: block; }
-@media (max-width: 900px) { .acciones-panel-cliente { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 560px) { .acciones-panel-cliente { grid-template-columns: 1fr; } }
+
+.marly-cuenta-banner {
+    min-height: 86px !important;
+    padding: 18px 28px !important;
+    border-radius: 13px !important;
+    background: #fffdf8 !important;
+    border: 1px solid rgba(201, 166, 70, .18) !important;
+    border-left: 4px solid var(--color-primario) !important;
+    box-shadow: 0 12px 28px rgba(45, 32, 36, .06) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 18px !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.marly-cuenta-banner-icono {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    background: var(--color-primario) !important;
+    color: #fff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 900 !important;
+    flex: 0 0 42px !important;
+}
+
+.marly-cuenta-banner h2 {
+    margin: 0 0 4px !important;
+    color: #2d2024 !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-cuenta-banner p {
+    margin: 0 !important;
+    color: #5f646d !important;
+    font-size: .92rem !important;
+}
+
+.marly-cuenta-flor {
+    position: absolute !important;
+    right: 34px !important;
+    color: rgba(201, 166, 70, .25) !important;
+    font-size: 4rem !important;
+}
+
+.tarjeta-cuenta,
+.marly-cuenta-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(201, 166, 70, .18) !important;
+    border-radius: 14px !important;
+    padding: 28px !important;
+    box-shadow: 0 14px 34px rgba(33, 19, 23, .07) !important;
+}
+
+.marly-cuenta-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 18px !important;
+    margin-bottom: 26px !important;
+}
+
+.marly-cuenta-avatar {
+    width: 58px !important;
+    height: 58px !important;
+    border-radius: 50% !important;
+    background: #fffaf0 !important;
+    border: 1px solid rgba(201, 166, 70, .22) !important;
+    color: var(--color-primario) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 58px !important;
+}
+
+.marly-cuenta-avatar svg {
+    width: 30px !important;
+    height: 30px !important;
+}
+
+.marly-cuenta-header h1 {
+    margin: 0 0 5px !important;
+    color: #2d2024 !important;
+    font-size: 1.2rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-cuenta-header p {
+    margin: 0 !important;
+    color: #5f646d !important;
+    font-size: .92rem !important;
+}
+
+.acciones-panel-cliente,
+.marly-cuenta-acciones {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+    margin: 0 !important;
+}
+
+.marly-cuenta-opcion {
+    min-height: 104px !important;
+    padding: 18px 16px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(201, 166, 70, .2) !important;
+    background: #ffffff !important;
+    color: #2d2024 !important;
+    text-decoration: none !important;
+    display: grid !important;
+    grid-template-columns: 48px 1fr 14px !important;
+    gap: 14px !important;
+    align-items: center !important;
+    text-align: left !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+    box-shadow: 0 10px 22px rgba(45, 32, 36, .04) !important;
+}
+
+.marly-cuenta-opcion-activa {
+    border-color: var(--color-primario) !important;
+}
+
+.marly-cuenta-opcion-icono {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    background: #fffaf0 !important;
+    border: 1px solid rgba(201, 166, 70, .2) !important;
+    color: var(--color-primario) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.marly-cuenta-opcion-icono svg {
+    width: 26px !important;
+    height: 26px !important;
+}
+
+.marly-cuenta-opcion strong {
+    display: block !important;
+    font-size: .88rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 5px !important;
+}
+
+.marly-cuenta-opcion small {
+    display: block !important;
+    color: #5f646d !important;
+    font-size: .78rem !important;
+    line-height: 1.45 !important;
+}
+
+.marly-cuenta-opcion b {
+    color: var(--color-primario) !important;
+    font-size: 1.7rem !important;
+    font-weight: 500 !important;
+}
+
+
+
+.marly-cuenta-salir-form {
+    display: flex !important;
+    justify-content: flex-end !important;
+    margin: 0 !important;
+}
+
+.marly-cuenta-salir {
+    min-height: 48px !important;
+    padding: 0 28px !important;
+    border-radius: 999px !important;
+    border: 2px solid var(--color-primario) !important;
+    background: #ffffff !important;
+    color: var(--color-primario) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+}
+
+.marly-cuenta-salir svg {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+.panel-edicion-cuenta {
+    display: none !important;
+}
+
+.panel-edicion-cuenta.visible {
+    display: block !important;
+}
+
+.marly-cuenta-eliminar {
+    border-color: rgba(202, 63, 91, .18) !important;
+}
+
+.marly-cuenta-eliminar-header {
+    display: flex !important;
+    gap: 18px !important;
+    align-items: flex-start !important;
+    margin-bottom: 20px !important;
+}
+
+.marly-cuenta-eliminar-icono {
+    width: 58px !important;
+    height: 58px !important;
+    border-radius: 50% !important;
+    background: rgba(202, 63, 91, .08) !important;
+    color: #c83f5b !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 58px !important;
+}
+
+.marly-cuenta-eliminar-icono svg {
+    width: 30px !important;
+    height: 30px !important;
+}
+
+.marly-cuenta-eliminar h2 {
+    margin: 0 0 6px !important;
+    font-size: 1.05rem !important;
+    color: #2d2024 !important;
+}
+
+.marly-cuenta-eliminar p {
+    margin: 0 !important;
+    color: #5f646d !important;
+    line-height: 1.5 !important;
+    font-size: .9rem !important;
+}
+
+.marly-cuenta-confirmacion {
+    min-height: 48px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(201, 166, 70, .18) !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    color: #2d2024 !important;
+    background: #ffffff !important;
+}
+
+.marly-cuenta-eliminar {
+    border-color: rgba(201, 166, 70, .16) !important;
+    border-radius: 13px !important;
+    padding: 28px 28px 26px !important;
+    box-shadow: 0 12px 32px rgba(33, 19, 23, .06) !important;
+}
+
+.marly-cuenta-eliminar-header {
+    display: flex !important;
+    gap: 18px !important;
+    align-items: flex-start !important;
+    margin-bottom: 22px !important;
+}
+
+.marly-cuenta-eliminar-icono {
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 50% !important;
+    background: rgba(202, 63, 91, .08) !important;
+    color: #c83f5b !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 64px !important;
+}
+
+.marly-cuenta-eliminar-icono svg {
+    width: 31px !important;
+    height: 31px !important;
+}
+
+.marly-cuenta-eliminar h2 {
+    margin: 0 0 6px !important;
+    font-size: 1.05rem !important;
+    line-height: 1.2 !important;
+    color: #2d2024 !important;
+    font-weight: 800 !important;
+}
+
+.marly-cuenta-eliminar p {
+    max-width: 720px !important;
+    margin: 0 !important;
+    color: #5f646d !important;
+    line-height: 1.55 !important;
+    font-size: .91rem !important;
+}
+
+.marly-cuenta-eliminar .rejilla-formulario {
+    gap: 22px !important;
+}
+
+.marly-cuenta-confirmacion {
+    width: 100% !important;
+    min-height: 52px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(201, 166, 70, .20) !important;
+    padding: 0 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    color: #2d2024 !important;
+    background: #ffffff !important;
+    font-size: .92rem !important;
+}
+
+.marly-cuenta-confirmacion input[type="checkbox"] {
+    width: 17px !important;
+    height: 17px !important;
+    accent-color: #c83f5b !important;
+    cursor: pointer !important;
+    flex: 0 0 17px !important;
+}
+
+.marly-cuenta-eliminar .acciones-formulario {
+    margin-top: 0 !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+}
+
+.marly-cuenta-btn-eliminar {
+    min-height: 48px !important;
+    padding: 0 26px !important;
+    border-radius: 999px !important;
+    background: #c83f5b !important;
+    color: #ffffff !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    font-size: .92rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-cuenta-btn-eliminar svg {
+    width: 18px !important;
+    height: 18px !important;
+}
+
+/* MODO OSCURO */
+body.modo-oscuro .marly-cuenta-exacto,
+html.modo-oscuro .marly-cuenta-exacto,
+[data-theme="dark"] .marly-cuenta-exacto {
+    background: #151515 !important;
+}
+
+body.modo-oscuro .marly-cuenta-banner,
+body.modo-oscuro .marly-cuenta-card,
+body.modo-oscuro .marly-cuenta-opcion,
+body.modo-oscuro .marly-cuenta-salir,
+body.modo-oscuro .marly-cuenta-confirmacion,
+html.modo-oscuro .marly-cuenta-banner,
+html.modo-oscuro .marly-cuenta-card,
+html.modo-oscuro .marly-cuenta-opcion,
+html.modo-oscuro .marly-cuenta-salir,
+html.modo-oscuro .marly-cuenta-confirmacion,
+[data-theme="dark"] .marly-cuenta-banner,
+[data-theme="dark"] .marly-cuenta-card,
+[data-theme="dark"] .marly-cuenta-opcion,
+[data-theme="dark"] .marly-cuenta-salir,
+[data-theme="dark"] .marly-cuenta-confirmacion {
+    background: #222222 !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+body.modo-oscuro .marly-cuenta-header h1,
+body.modo-oscuro .marly-cuenta-banner h2,
+body.modo-oscuro .marly-cuenta-eliminar h2,
+body.modo-oscuro .marly-cuenta-opcion,
+body.modo-oscuro .marly-cuenta-confirmacion,
+html.modo-oscuro .marly-cuenta-header h1,
+html.modo-oscuro .marly-cuenta-banner h2,
+html.modo-oscuro .marly-cuenta-eliminar h2,
+html.modo-oscuro .marly-cuenta-opcion,
+html.modo-oscuro .marly-cuenta-confirmacion,
+[data-theme="dark"] .marly-cuenta-header h1,
+[data-theme="dark"] .marly-cuenta-banner h2,
+[data-theme="dark"] .marly-cuenta-eliminar h2,
+[data-theme="dark"] .marly-cuenta-opcion,
+[data-theme="dark"] .marly-cuenta-confirmacion {
+    color: #f5f5f5 !important;
+}
+
+body.modo-oscuro .marly-cuenta-header p,
+body.modo-oscuro .marly-cuenta-banner p,
+body.modo-oscuro .marly-cuenta-eliminar p,
+body.modo-oscuro .marly-cuenta-opcion small,
+html.modo-oscuro .marly-cuenta-header p,
+html.modo-oscuro .marly-cuenta-banner p,
+html.modo-oscuro .marly-cuenta-eliminar p,
+html.modo-oscuro .marly-cuenta-opcion small,
+[data-theme="dark"] .marly-cuenta-header p,
+[data-theme="dark"] .marly-cuenta-banner p,
+[data-theme="dark"] .marly-cuenta-eliminar p,
+[data-theme="dark"] .marly-cuenta-opcion small {
+    color: #cfcfcf !important;
+}
+
+body.modo-oscuro .marly-cuenta-avatar,
+body.modo-oscuro .marly-cuenta-opcion-icono,
+body.modo-oscuro .marly-cuenta-banner-icono,
+html.modo-oscuro .marly-cuenta-avatar,
+html.modo-oscuro .marly-cuenta-opcion-icono,
+html.modo-oscuro .marly-cuenta-banner-icono,
+[data-theme="dark"] .marly-cuenta-avatar,
+[data-theme="dark"] .marly-cuenta-opcion-icono,
+[data-theme="dark"] .marly-cuenta-banner-icono {
+    background: #2b2b2b !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+@media (max-width: 900px) {
+    .marly-cuenta-acciones {
+        grid-template-columns: 1fr !important;
+    }
+
+    .marly-cuenta-banner {
+        padding: 18px 20px !important;
+    }
+}
+
+@media (max-width: 560px) {
+    .marly-cuenta-header,
+    .marly-cuenta-eliminar-header {
+        flex-direction: column !important;
+    }
+
+    .marly-cuenta-salir-form {
+        justify-content: stretch !important;
+    }
+
+    .marly-cuenta-salir {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+/* ANIMACIONES BOTONES MI CUENTA */
+.marly-cuenta-opcion,
+.marly-cuenta-salir,
+.marly-cuenta-btn-eliminar {
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease, color .22s ease !important;
+}
+
+.marly-cuenta-opcion:hover {
+    transform: translateY(-4px) !important;
+    border-color: var(--color-primario) !important;
+    box-shadow: 0 16px 34px rgba(201, 166, 70, .16) !important;
+}
+
+.marly-cuenta-opcion:hover .marly-cuenta-opcion-icono {
+    transform: scale(1.08) rotate(-3deg) !important;
+    background: rgba(201, 166, 70, .12) !important;
+}
+
+.marly-cuenta-opcion:hover b {
+    transform: translateX(4px) !important;
+}
+
+.marly-cuenta-opcion-icono,
+.marly-cuenta-opcion b {
+    transition: transform .22s ease, background .22s ease !important;
+}
+
+.marly-cuenta-salir:hover {
+    transform: translateY(-3px) !important;
+    background: rgba(201, 166, 70, .08) !important;
+    box-shadow: 0 14px 28px rgba(201, 166, 70, .14) !important;
+}
+
+.marly-cuenta-salir:hover svg {
+    transform: translateX(3px) !important;
+}
+
+.marly-cuenta-salir svg {
+    transition: transform .22s ease !important;
+}
+
+.marly-cuenta-btn-eliminar:hover {
+    transform: translateY(-3px) !important;
+    background: #b8344e !important;
+    box-shadow: 0 14px 28px rgba(200, 63, 91, .22) !important;
+}
+
+.marly-cuenta-opcion:active,
+.marly-cuenta-salir:active,
+.marly-cuenta-btn-eliminar:active {
+    transform: scale(.98) !important;
+}
+/* ALERTA TEMPORAL MI CUENTA */
+.marly-cuenta-banner-temporal {
+    animation: marlyAlertaEntrada .45s ease both !important;
+    transition: opacity .45s ease, transform .45s ease, max-height .45s ease, margin .45s ease, padding .45s ease !important;
+}
+
+.marly-cuenta-banner-temporal.marly-alerta-ocultando {
+    opacity: 0 !important;
+    transform: translateY(-12px) !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    overflow: hidden !important;
+}
+
+@keyframes marlyAlertaEntrada {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,11 +1,635 @@
-.seccion-formulario { padding: 72px 0; }
-.contenedor-formulario { max-width: 720px; }
-.tarjeta-formulario {
-    background: #fff; border: 1px solid var(--color-borde); border-radius: 24px;
-    padding: 34px; box-shadow: 0 14px 34px rgba(33, 19, 23, .07);
+.seccion-formulario {
+    padding: 72px 0;
 }
-.tarjeta-formulario h1 { margin-top: 0; margin-bottom: 10px; color: #2d2024; }
-.tarjeta-formulario p { margin-bottom: 24px; color: var(--color-texto-suave); }
+
+.contenedor-formulario {
+    max-width: 680px;
+}
+
+.tarjeta-formulario {
+    background: #fff;
+    border: 1px solid var(--color-borde);
+    border-radius: 24px;
+    padding: 34px;
+    box-shadow: 0 14px 34px rgba(33, 19, 23, .07);
+}
+
+.tarjeta-formulario h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #2d2024;
+}
+
+.tarjeta-formulario p {
+    margin-bottom: 24px;
+    color: var(--color-texto-suave);
+}
+
+/* LOGIN MARLY */
+.marly-login-exacto {
+    padding: 54px 0 64px !important;
+    background: #ffffff !important;
+}
+
+.marly-login-wrapper {
+    max-width: 500px !important;
+    margin: 0 auto !important;
+    padding: 34px 44px 38px !important;
+    border-radius: 28px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(201, 166, 70, .18) !important;
+    box-shadow: 0 18px 42px rgba(45, 32, 36, .08) !important;
+}
+
+.marly-login-header {
+    text-align: center !important;
+    margin-bottom: 26px !important;
+}
+
+.marly-login-header h1 {
+    margin: 0 0 10px !important;
+    font-size: clamp(2.1rem, 7vw, 3rem) !important;
+    font-weight: 750 !important;
+    line-height: 1.05 !important;
+    color: #2d2024 !important;
+}
+
+.marly-login-header p {
+    margin: 0 !important;
+    font-size: 1rem !important;
+    color: #5f646d !important;
+}
+
+.marly-login-google {
+    width: 100% !important;
+    min-height: 56px !important;
+    border-radius: 15px !important;
+    border: 1px solid rgba(201, 166, 70, .18) !important;
+    background: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 14px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #2d2024 !important;
+    text-decoration: none !important;
+    box-shadow: 0 8px 18px rgba(45, 32, 36, .05) !important;
+}
+
+.marly-login-google img {
+    width: 25px !important;
+    height: 25px !important;
+}
+
+.marly-login-divider {
+    position: relative !important;
+    text-align: center !important;
+    margin: 28px 0 24px !important;
+}
+
+.marly-login-divider::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 50% !important;
+    height: 1px !important;
+    background: rgba(201, 166, 70, .22) !important;
+}
+
+.marly-login-divider span {
+    position: relative !important;
+    z-index: 2 !important;
+    background: #ffffff !important;
+    padding: 0 26px !important;
+    color: #5f646d !important;
+    font-size: .98rem !important;
+}
+
+.marly-login-form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 22px !important;
+}
+
+.marly-login-group label {
+    display: block !important;
+    margin-bottom: 10px !important;
+    font-size: .98rem !important;
+    font-weight: 750 !important;
+    color: #2d2024 !important;
+}
+
+.marly-login-input {
+    min-height: 58px !important;
+    border-radius: 15px !important;
+    border: 1px solid rgba(201, 166, 70, .22) !important;
+    background: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 18px !important;
+    gap: 14px !important;
+}
+
+.marly-login-icono {
+    width: 22px !important;
+    height: 22px !important;
+    color: var(--color-primario) !important;
+    flex: 0 0 22px !important;
+    display: inline-flex !important;
+}
+
+.marly-login-icono svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.marly-login-input input {
+    flex: 1 !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    font-size: 1rem !important;
+    color: #2d2024 !important;
+}
+
+.marly-login-input input::placeholder {
+    color: #9b9b9b !important;
+    opacity: 1 !important;
+}
+
+.marly-login-eye {
+    width: 23px !important;
+    height: 23px !important;
+    border: none !important;
+    background: transparent !important;
+    color: #7c7c7c !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+}
+
+.marly-login-eye svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.marly-login-forgot-row {
+    display: flex !important;
+    justify-content: flex-end !important;
+    margin-top: 8px !important;
+}
+
+.marly-login-forgot-row a {
+    color: var(--color-primario) !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    font-size: .95rem !important;
+}
+
+.marly-login-submit {
+    width: 100% !important;
+    min-height: 58px !important;
+    border: none !important;
+    border-radius: 15px !important;
+    background: linear-gradient(135deg, var(--color-primario) 0%, #d8b659 100%) !important;
+    color: #ffffff !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    box-shadow: 0 14px 28px rgba(201, 166, 70, .22) !important;
+}
+
+.marly-login-register {
+    text-align: center !important;
+    margin: 0 !important;
+    color: #5f646d !important;
+    font-size: .98rem !important;
+}
+
+.marly-login-register a {
+    color: var(--color-primario) !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+}
+
+/* MODO OSCURO LOGIN */
+body.modo-oscuro .marly-login-exacto,
+html.modo-oscuro .marly-login-exacto,
+[data-theme="dark"] .marly-login-exacto {
+    background: #151515 !important;
+}
+
+body.modo-oscuro .marly-login-wrapper,
+html.modo-oscuro .marly-login-wrapper,
+[data-theme="dark"] .marly-login-wrapper {
+    background: #222222 !important;
+    border-color: rgba(201, 166, 70, .22) !important;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, .35) !important;
+}
+
+body.modo-oscuro .marly-login-header h1,
+body.modo-oscuro .marly-login-group label,
+body.modo-oscuro .marly-login-google,
+body.modo-oscuro .marly-login-input input,
+html.modo-oscuro .marly-login-header h1,
+html.modo-oscuro .marly-login-group label,
+html.modo-oscuro .marly-login-google,
+html.modo-oscuro .marly-login-input input,
+[data-theme="dark"] .marly-login-header h1,
+[data-theme="dark"] .marly-login-group label,
+[data-theme="dark"] .marly-login-google,
+[data-theme="dark"] .marly-login-input input {
+    color: #f5f5f5 !important;
+}
+
+body.modo-oscuro .marly-login-header p,
+body.modo-oscuro .marly-login-divider span,
+body.modo-oscuro .marly-login-register,
+body.modo-oscuro .marly-login-input input::placeholder,
+html.modo-oscuro .marly-login-header p,
+html.modo-oscuro .marly-login-divider span,
+html.modo-oscuro .marly-login-register,
+html.modo-oscuro .marly-login-input input::placeholder,
+[data-theme="dark"] .marly-login-header p,
+[data-theme="dark"] .marly-login-divider span,
+[data-theme="dark"] .marly-login-register,
+[data-theme="dark"] .marly-login-input input::placeholder {
+    color: #cfcfcf !important;
+}
+
+body.modo-oscuro .marly-login-google,
+html.modo-oscuro .marly-login-google,
+[data-theme="dark"] .marly-login-google {
+    background: #2b2b2b !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+body.modo-oscuro .marly-login-input,
+html.modo-oscuro .marly-login-input,
+[data-theme="dark"] .marly-login-input {
+    background: #2b2b2b !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+body.modo-oscuro .marly-login-divider::before,
+html.modo-oscuro .marly-login-divider::before,
+[data-theme="dark"] .marly-login-divider::before {
+    background: rgba(255, 255, 255, .14) !important;
+}
+
+body.modo-oscuro .marly-login-divider span,
+html.modo-oscuro .marly-login-divider span,
+[data-theme="dark"] .marly-login-divider span {
+    background: #222222 !important;
+}
+
+body.modo-oscuro .marly-login-eye,
+html.modo-oscuro .marly-login-eye,
+[data-theme="dark"] .marly-login-eye {
+    color: #cfcfcf !important;
+}
+
+body.modo-oscuro .marly-login-submit,
+html.modo-oscuro .marly-login-submit,
+[data-theme="dark"] .marly-login-submit {
+    color: #1d1d1d !important;
+}
+/* REGISTRO MARLY */
+/* REGISTRO MARLY COMPACTO */
+.marly-registro-exacto {
+    background: #ffffff !important;
+    padding: 48px 0 58px !important;
+}
+
+.marly-registro-wrapper {
+    max-width: 620px !important;
+    margin: 0 auto !important;
+    padding: 28px 34px 30px !important;
+    border-radius: 26px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(201, 166, 70, .18) !important;
+    box-shadow: 0 18px 42px rgba(45, 32, 36, .08) !important;
+}
+
+.marly-registro-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 18px !important;
+    margin-bottom: 24px !important;
+}
+
+.marly-registro-header-icono {
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 50% !important;
+    background: #f7f1e7 !important;
+    border: 1px solid rgba(201, 166, 70, .18) !important;
+    color: var(--color-primario) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 64px !important;
+    box-shadow: 0 10px 24px rgba(45, 32, 36, .06) !important;
+}
+
+.marly-registro-header-icono svg {
+    width: 34px !important;
+    height: 34px !important;
+}
+
+.marly-registro-header h1 {
+    margin: 0 0 6px !important;
+    font-size: 1.35rem !important;
+    color: #2d2024 !important;
+    font-weight: 800 !important;
+}
+
+.marly-registro-header p {
+    margin: 0 !important;
+    color: #5f646d !important;
+    font-size: .95rem !important;
+}
+
+.marly-registro-google {
+    width: 100% !important;
+    min-height: 50px !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(201, 166, 70, .18) !important;
+    background: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 14px !important;
+    text-decoration: none !important;
+    color: #2d2024 !important;
+    font-weight: 600 !important;
+    font-size: .98rem !important;
+    box-shadow: 0 10px 24px rgba(45, 32, 36, .05) !important;
+}
+
+.marly-registro-google img {
+    width: 24px !important;
+    height: 24px !important;
+}
+
+.marly-registro-divider {
+    position: relative !important;
+    text-align: center !important;
+    margin: 24px 0 20px !important;
+}
+
+.marly-registro-divider::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 50% !important;
+    height: 1px !important;
+    background: rgba(201, 166, 70, .22) !important;
+}
+
+.marly-registro-divider span {
+    position: relative !important;
+    z-index: 2 !important;
+    background: #ffffff !important;
+    padding: 0 20px !important;
+    color: #5f646d !important;
+    font-size: .92rem !important;
+}
+
+.marly-registro-form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+}
+
+.marly-registro-input {
+    min-height: 62px !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(201, 166, 70, .22) !important;
+    background: #ffffff !important;
+    display: grid !important;
+    grid-template-columns: 30px 1fr auto !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 0 18px !important;
+}
+
+.marly-registro-icono {
+    width: 25px !important;
+    height: 25px !important;
+    color: var(--color-primario) !important;
+    display: inline-flex !important;
+}
+
+.marly-registro-icono svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.marly-registro-input label {
+    display: block !important;
+    margin: 0 0 4px !important;
+    font-size: .82rem !important;
+    font-weight: 800 !important;
+    color: #2d2024 !important;
+}
+
+.marly-registro-input input {
+    width: 100% !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    color: #2d2024 !important;
+    font-size: .95rem !important;
+    padding: 0 !important;
+}
+
+.marly-registro-input input::placeholder {
+    color: #8d929b !important;
+    opacity: 1 !important;
+}
+
+.marly-registro-ayuda {
+    display: block !important;
+    margin: 6px 0 0 !important;
+    color: #5f646d !important;
+    font-size: .8rem !important;
+}
+
+.marly-password-eye {
+    width: 23px !important;
+    height: 23px !important;
+    border: none !important;
+    background: transparent !important;
+    color: #7c7c7c !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+}
+
+.marly-password-eye svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.marly-registro-acciones {
+    display: flex !important;
+    gap: 14px !important;
+    flex-wrap: wrap !important;
+    margin-top: 8px !important;
+}
+
+.marly-registro-submit,
+.marly-registro-login {
+    min-height: 48px !important;
+    padding: 0 26px !important;
+    border-radius: 15px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    font-size: .95rem !important;
+}
+
+.marly-registro-submit {
+    border: none !important;
+    background: linear-gradient(135deg, var(--color-primario), #d8b659) !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    box-shadow: 0 14px 28px rgba(201, 166, 70, .22) !important;
+}
+
+.marly-registro-login {
+    background: #ffffff !important;
+    color: var(--color-primario) !important;
+    border: 2px solid var(--color-primario) !important;
+}
+
+/* REGISTRO MODO OSCURO */
+body.modo-oscuro .marly-registro-exacto,
+html.modo-oscuro .marly-registro-exacto,
+[data-theme="dark"] .marly-registro-exacto {
+    background: #151515 !important;
+}
+
+body.modo-oscuro .marly-registro-wrapper,
+html.modo-oscuro .marly-registro-wrapper,
+[data-theme="dark"] .marly-registro-wrapper {
+    background: #222222 !important;
+    border-color: rgba(201, 166, 70, .22) !important;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, .35) !important;
+}
+
+body.modo-oscuro .marly-registro-header h1,
+body.modo-oscuro .marly-registro-input label,
+body.modo-oscuro .marly-registro-input input,
+body.modo-oscuro .marly-registro-google,
+html.modo-oscuro .marly-registro-header h1,
+html.modo-oscuro .marly-registro-input label,
+html.modo-oscuro .marly-registro-input input,
+html.modo-oscuro .marly-registro-google,
+[data-theme="dark"] .marly-registro-header h1,
+[data-theme="dark"] .marly-registro-input label,
+[data-theme="dark"] .marly-registro-input input,
+[data-theme="dark"] .marly-registro-google {
+    color: #f5f5f5 !important;
+}
+
+body.modo-oscuro .marly-registro-header p,
+body.modo-oscuro .marly-registro-divider span,
+body.modo-oscuro .marly-registro-input input::placeholder,
+body.modo-oscuro .marly-registro-ayuda,
+html.modo-oscuro .marly-registro-header p,
+html.modo-oscuro .marly-registro-divider span,
+html.modo-oscuro .marly-registro-input input::placeholder,
+html.modo-oscuro .marly-registro-ayuda,
+[data-theme="dark"] .marly-registro-header p,
+[data-theme="dark"] .marly-registro-divider span,
+[data-theme="dark"] .marly-registro-input input::placeholder,
+[data-theme="dark"] .marly-registro-ayuda {
+    color: #cfcfcf !important;
+}
+
+body.modo-oscuro .marly-registro-google,
+body.modo-oscuro .marly-registro-input,
+html.modo-oscuro .marly-registro-google,
+html.modo-oscuro .marly-registro-input,
+[data-theme="dark"] .marly-registro-google,
+[data-theme="dark"] .marly-registro-input {
+    background: #2b2b2b !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+body.modo-oscuro .marly-registro-divider::before,
+html.modo-oscuro .marly-registro-divider::before,
+[data-theme="dark"] .marly-registro-divider::before {
+    background: rgba(255, 255, 255, .14) !important;
+}
+
+body.modo-oscuro .marly-registro-divider span,
+html.modo-oscuro .marly-registro-divider span,
+[data-theme="dark"] .marly-registro-divider span {
+    background: rgb(52, 52, 52) !important;
+}
+
+body.modo-oscuro .marly-registro-header-icono,
+html.modo-oscuro .marly-registro-header-icono,
+[data-theme="dark"] .marly-registro-header-icono {
+    background: #2b2b2b !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+body.modo-oscuro .marly-password-eye,
+html.modo-oscuro .marly-password-eye,
+[data-theme="dark"] .marly-password-eye {
+    color: #cfcfcf !important;
+}
+
 @media (max-width: 768px) {
-    .tarjeta-formulario { padding: 24px; }
+    .marly-registro-exacto {
+        padding: 38px 0 48px !important;
+    }
+
+    .marly-registro-wrapper {
+        padding: 26px 20px 30px !important;
+    }
+
+    .marly-registro-header {
+        align-items: flex-start !important;
+        gap: 14px !important;
+    }
+
+    .marly-registro-header-icono {
+        width: 58px !important;
+        height: 58px !important;
+        flex-basis: 58px !important;
+    }
+
+    .marly-registro-header-icono svg {
+        width: 30px !important;
+        height: 30px !important;
+    }
+
+    .marly-registro-header h1 {
+        font-size: 1.18rem !important;
+    }
+
+    .marly-registro-input {
+        min-height: 60px !important;
+        padding: 0 14px !important;
+        grid-template-columns: 28px 1fr auto !important;
+    }
+
+    .marly-registro-acciones {
+        flex-direction: column !important;
+    }
+
+    .marly-registro-submit,
+    .marly-registro-login {
+        width: 100% !important;
+    }
 }

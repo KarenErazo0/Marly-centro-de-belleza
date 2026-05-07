@@ -291,14 +291,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    btnGlobalConfirmar?.addEventListener('click', () => {
-        if (!formularioPendiente) return;
-        formularioPendiente.dataset.confirmado = 'true';
-        botonPendiente?.setAttribute('disabled', 'disabled');
-        modalGlobal.classList.remove('visible');
-        formularioPendiente.submit();
-    });
+btnGlobalConfirmar?.addEventListener('click', () => {
+    if (!formularioPendiente) return;
+    formularioPendiente.dataset.confirmado = 'true';
+    botonPendiente?.setAttribute('disabled', 'disabled');
+    modalGlobal.classList.remove('visible');
+    formularioPendiente.submit();
+});
 
+const mensajesSistema = document.querySelectorAll(
+    '.alerta, .alerta-exito, .alerta-error, .admin-alert'
+);
+
+mensajesSistema.forEach((mensaje) => {
+    const texto = mensaje.innerText.trim().length;
+
+    let duracion = 5500;
+
+    const esError =
+        mensaje.classList.contains('alerta-error') ||
+        mensaje.classList.contains('error') ||
+        mensaje.classList.contains('admin-alert') && mensaje.classList.contains('error');
+
+    if (esError) {
+        duracion = 8000;
+    }
+
+    if (texto > 120) {
+        duracion += 2000;
+    }
+
+    setTimeout(() => {
+        mensaje.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+        mensaje.style.opacity = '0';
+        mensaje.style.transform = 'translateY(-10px)';
+
+        setTimeout(() => {
+            mensaje.remove();
+        }, 500);
+    }, duracion);
+});
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -351,3 +383,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+document.addEventListener('DOMContentLoaded', () => {
+    const userMenu = document.querySelector('[data-user-menu]');
+    const userMenuButton = document.querySelector('[data-user-menu-button]');
+
+    userMenuButton?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        userMenu?.classList.toggle('abierto');
+    });
+
+    document.addEventListener('click', (event) => {
+        if (userMenu && !userMenu.contains(event.target)) {
+            userMenu.classList.remove('abierto');
+        }
+    });
+});
+import './cuenta-alerta-temporal';
+import './login-password-toggle';

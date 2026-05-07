@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -23,22 +24,37 @@ class ControladorAdminDashboard extends Controller
     public function index(Request $request): View
     {
         Carbon::setLocale('es');
+
         $hoy = Carbon::today();
         $fechaSeleccionada = $request->query('fecha') ? Carbon::parse($request->query('fecha')) : $hoy->copy();
         $mesActual = $request->query('mes') ? Carbon::createFromFormat('Y-m', $request->query('mes'))->startOfMonth() : $fechaSeleccionada->copy()->startOfMonth();
+
         $inicioMes = $mesActual->copy()->startOfMonth();
         $finMes = $mesActual->copy()->endOfMonth();
+
         $busqueda = trim((string) $request->query('buscar', ''));
-        $tab = in_array($request->query('tab'), ['configuracion', 'servicios', 'personal', 'citas', 'clientes'], true) ? $request->query('tab') : 'personal';
+        $tab = in_array($request->query('tab'), ['configuracion', 'servicios', 'personal', 'citas', 'clientes'], true)
+            ? $request->query('tab')
+            : 'personal';
 
         $citasPorDia = Cita::whereBetween('fecha_cita', [$inicioMes->format('Y-m-d'), $finMes->format('Y-m-d')])
             ->selectRaw('fecha_cita, COUNT(*) as total')
             ->groupBy('fecha_cita')
             ->pluck('total', 'fecha_cita');
 
-        $todasCitas = $this->consultaCitas($busqueda)->orderByDesc('fecha_cita')->orderByDesc('hora_inicio')->get();
-        $servicios = Servicio::with(['trabajadores' => fn ($q) => $q->orderBy('nombre_completo')])->orderBy('nombre_servicio')->get();
-        $trabajadores = Trabajador::with('servicios')->orderBy('nombre_completo')->get();
+        $todasCitas = $this->consultaCitas($busqueda)
+            ->orderByDesc('fecha_cita')
+            ->orderByDesc('hora_inicio')
+            ->get();
+
+        $servicios = Servicio::with(['trabajadores' => fn ($q) => $q->orderBy('nombre_completo')])
+            ->orderBy('nombre_servicio')
+            ->get();
+
+        $trabajadores = Trabajador::with('servicios')
+            ->orderBy('nombre_completo')
+            ->get();
+
         $clientes = Cliente::orderByDesc('fecha_registro')->get();
 
         return view('admin.dashboard', [
@@ -82,6 +98,7 @@ class ControladorAdminDashboard extends Controller
         ]);
 
         $configuracion = $this->configuracionSitio();
+
         if ($request->hasFile('hero_imagen')) {
             $validated['hero_imagen'] = $this->guardarImagen($request, 'hero_imagen', 'site', 'hero-admin');
             $this->eliminarImagenPublica($configuracion->hero_imagen, 'images/site/');
@@ -89,41 +106,59 @@ class ControladorAdminDashboard extends Controller
 
         $configuracion->fill($validated)->save();
 
-        return redirect()->route('admin.dashboard', ['tab' => 'configuracion'])->with('success', 'La página principal fue actualizada correctamente.');
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'configuracion'])
+            ->with('success', 'La página principal fue actualizada correctamente.');
     }
 
     public function guardarServicio(Request $request): RedirectResponse
     {
         $validated = $request->validate($this->reglasServicio(true), [], $this->atributosServicio());
+
         if ($request->hasFile('imagen')) {
             $validated['imagen'] = $this->guardarImagen($request, 'imagen', 'services', 'admin-service');
         }
+
         $validated['estado'] = $request->boolean('estado') ? 'activo' : 'inactivo';
 
         Servicio::create($validated);
 
-        return redirect()->route('admin.dashboard', ['tab' => 'servicios'])->with('success', 'Servicio agregado correctamente.');
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'servicios'])
+            ->with('success', 'Servicio agregado correctamente.');
     }
 
     public function actualizarServicio(Request $request, Servicio $servicio): RedirectResponse
     {
         $validated = $request->validate($this->reglasServicio(false), [], $this->atributosServicio());
+
         if ($request->hasFile('imagen')) {
             $validated['imagen'] = $this->guardarImagen($request, 'imagen', 'services', 'admin-service');
             $this->eliminarImagenPublica($servicio->imagen, 'images/services/');
         }
+
         $validated['estado'] = $request->boolean('estado') ? 'activo' : 'inactivo';
+
         $servicio->update($validated);
 
-        return redirect()->route('admin.dashboard', ['tab' => 'servicios'])->with('success', 'Servicio actualizado correctamente.');
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'servicios'])
+            ->with('success', 'Servicio actualizado correctamente.');
     }
 
     public function cambiarEstadoServicio(Servicio $servicio): RedirectResponse
     {
-        $servicio->update(['estado' => $servicio->estado === 'activo' ? 'inactivo' : 'activo']);
-        $mensaje = $servicio->estado === 'activo' ? 'Servicio activado y visible para clientes.' : 'Servicio desactivado y oculto para clientes.';
+        $servicio->update([
+            'estado' => $servicio->estado === 'activo' ? 'inactivo' : 'activo',
+        ]);
 
-        return redirect()->route('admin.dashboard', ['tab' => 'servicios'])->with('success', $mensaje);
+        $mensaje = $servicio->estado === 'activo'
+            ? 'Servicio activado y visible para clientes.'
+            : 'Servicio desactivado y oculto para clientes.';
+
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'servicios'])
+            ->with('success', $mensaje);
     }
 
     public function eliminarServicio(Servicio $servicio): RedirectResponse
@@ -131,8 +166,12 @@ class ControladorAdminDashboard extends Controller
         try {
             $imagen = $servicio->imagen;
             $servicio->delete();
+
             $this->eliminarImagenPublica($imagen, 'images/services/');
-            return redirect()->route('admin.dashboard', ['tab' => 'servicios'])->with('success', 'Servicio eliminado completamente del catálogo.');
+
+            return redirect()
+                ->route('admin.dashboard', ['tab' => 'servicios'])
+                ->with('success', 'Servicio eliminado completamente del catálogo.');
         } catch (QueryException $exception) {
             return back()->with('error', 'No se pudo eliminar el servicio porque está relacionado con registros existentes. Puedes dejarlo inactivo para ocultarlo al cliente.');
         }
@@ -142,7 +181,9 @@ class ControladorAdminDashboard extends Controller
     {
         $validated = $request->validate([
             'nombre_servicio' => ['required', 'string', 'max:100', 'unique:servicios,nombre_servicio'],
-        ], [], ['nombre_servicio' => 'nombre de la sección']);
+        ], [], [
+            'nombre_servicio' => 'nombre de la sección',
+        ]);
 
         Servicio::create([
             'nombre_servicio' => $validated['nombre_servicio'],
@@ -153,31 +194,40 @@ class ControladorAdminDashboard extends Controller
             'imagen' => 'default-service.jpg',
         ]);
 
-        return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Sección creada correctamente.');
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('success', 'Sección creada correctamente.');
     }
-
 
     public function actualizarSeccionPersonal(Request $request, Servicio $servicio): RedirectResponse
     {
         $validated = $request->validate([
             'nombre_servicio' => ['required', 'string', 'max:100'],
-        ], [], ['nombre_servicio' => 'nombre de la sección']);
+        ], [], [
+            'nombre_servicio' => 'nombre de la sección',
+        ]);
 
         $servicio->update([
             'nombre_servicio' => $validated['nombre_servicio'],
         ]);
 
         foreach ($servicio->trabajadores as $trabajador) {
-            $trabajador->update(['especialidad' => $validated['nombre_servicio']]);
+            $trabajador->update([
+                'especialidad' => $validated['nombre_servicio'],
+            ]);
         }
 
-        return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Sección actualizada correctamente.');
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('success', 'Sección actualizada correctamente.');
     }
 
     public function guardarTrabajador(Request $request): RedirectResponse
     {
         $validated = $request->validate($this->reglasTrabajador(true), [], $this->atributosTrabajador());
+
         $servicio = Servicio::findOrFail($validated['id_servicio']);
+
         if ($request->hasFile('foto')) {
             $validated['foto'] = $this->guardarImagen($request, 'foto', 'services', 'admin-worker');
         }
@@ -185,33 +235,39 @@ class ControladorAdminDashboard extends Controller
         $trabajador = Trabajador::create([
             'nombre_completo' => $validated['nombre_completo'],
             'especialidad' => $servicio->nombre_servicio,
-            'anios_experiencia' => 0,
-            'total_resenas' => 0,
-            'calificacion' => 5.0,
             'foto' => $validated['foto'] ?? 'default-service.jpg',
             'estado' => 'activo',
         ]);
+
         $trabajador->servicios()->sync([$servicio->id_servicio]);
 
-        return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Trabajador agregado correctamente.');
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('success', 'Trabajador agregado correctamente.');
     }
 
     public function actualizarTrabajador(Request $request, Trabajador $trabajador): RedirectResponse
     {
         $validated = $request->validate($this->reglasTrabajador(false), [], $this->atributosTrabajador());
+
         $servicio = Servicio::findOrFail($validated['id_servicio']);
+
         $data = [
             'nombre_completo' => $validated['nombre_completo'],
             'especialidad' => $servicio->nombre_servicio,
         ];
+
         if ($request->hasFile('foto')) {
             $data['foto'] = $this->guardarImagen($request, 'foto', 'services', 'admin-worker');
             $this->eliminarImagenPublica($trabajador->foto, 'images/services/');
         }
+
         $trabajador->update($data);
         $trabajador->servicios()->sync([$servicio->id_servicio]);
 
-        return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Trabajador actualizado correctamente.');
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('success', 'Trabajador actualizado correctamente.');
     }
 
     public function eliminarTrabajador(Trabajador $trabajador): RedirectResponse
@@ -219,8 +275,12 @@ class ControladorAdminDashboard extends Controller
         try {
             $foto = $trabajador->foto;
             $trabajador->delete();
+
             $this->eliminarImagenPublica($foto, 'images/services/');
-            return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Trabajador eliminado correctamente.');
+
+            return redirect()
+                ->route('admin.dashboard', ['tab' => 'personal'])
+                ->with('success', 'Trabajador eliminado correctamente.');
         } catch (QueryException $exception) {
             return back()->with('error', 'No se pudo eliminar el trabajador porque tiene citas asociadas. Puedes conservarlo para mantener el historial de citas.');
         }
@@ -230,10 +290,15 @@ class ControladorAdminDashboard extends Controller
     {
         try {
             $servicio->trabajadores()->detach();
+
             $imagen = $servicio->imagen;
             $servicio->delete();
+
             $this->eliminarImagenPublica($imagen, 'images/services/');
-            return redirect()->route('admin.dashboard', ['tab' => 'personal'])->with('success', 'Sección eliminada correctamente.');
+
+            return redirect()
+                ->route('admin.dashboard', ['tab' => 'personal'])
+                ->with('success', 'Sección eliminada correctamente.');
         } catch (QueryException $exception) {
             return back()->with('error', 'No se pudo eliminar la sección porque tiene registros asociados.');
         }
@@ -241,7 +306,9 @@ class ControladorAdminDashboard extends Controller
 
     public function actualizarAsistencia(Request $request, Cita $cita): RedirectResponse
     {
-        $validated = $request->validate(['estado' => ['required', 'in:completada,inasistencia']]);
+        $validated = $request->validate([
+            'estado' => ['required', 'in:completada,inasistencia'],
+        ]);
 
         if ($cita->estado === 'cancelada') {
             return back()->with('error', 'No se puede registrar asistencia en una cita cancelada.');
@@ -252,9 +319,14 @@ class ControladorAdminDashboard extends Controller
         }
 
         $this->garantizarEstadosCitasHu07();
-        $cita->update(['estado' => $validated['estado']]);
 
-        $mensaje = $validated['estado'] === 'completada' ? 'La cita fue marcada como asistida correctamente.' : 'La cita fue marcada como no asistida correctamente.';
+        $cita->update([
+            'estado' => $validated['estado'],
+        ]);
+
+        $mensaje = $validated['estado'] === 'completada'
+            ? 'La cita fue marcada como asistida correctamente.'
+            : 'La cita fue marcada como no asistida correctamente.';
 
         return back()->with('success', $mensaje);
     }
@@ -296,20 +368,132 @@ class ControladorAdminDashboard extends Controller
     private function guardarImagen(Request $request, string $campo, string $carpeta, string $prefijo): string
     {
         $archivo = $request->file($campo);
-        $nombre = $prefijo . '-' . uniqid() . '.' . $archivo->getClientOriginalExtension();
         $destino = public_path('images/' . $carpeta);
+
         File::ensureDirectoryExists($destino);
-        $archivo->move($destino, $nombre);
-        return $nombre;
+
+        $medidas = $this->medidasImagenPorPrefijo($prefijo);
+
+        $nombre = $prefijo . '-' . uniqid() . '.jpg';
+        $rutaDestino = $destino . DIRECTORY_SEPARATOR . $nombre;
+
+        if ($archivo instanceof UploadedFile && $this->procesarImagenProfesional($archivo, $rutaDestino, $medidas['ancho'], $medidas['alto'])) {
+            return $nombre;
+        }
+
+        $extension = $archivo?->getClientOriginalExtension() ?: 'jpg';
+        $nombreFallback = $prefijo . '-' . uniqid() . '.' . $extension;
+
+        $archivo->move($destino, $nombreFallback);
+
+        return $nombreFallback;
+    }
+
+    private function medidasImagenPorPrefijo(string $prefijo): array
+    {
+        return match ($prefijo) {
+            'admin-service' => [
+                'ancho' => 1200,
+                'alto' => 800,
+            ],
+            'admin-worker' => [
+                'ancho' => 900,
+                'alto' => 900,
+            ],
+            'hero-admin' => [
+                'ancho' => 1600,
+                'alto' => 900,
+            ],
+            default => [
+                'ancho' => 1200,
+                'alto' => 800,
+            ],
+        };
+    }
+
+    private function procesarImagenProfesional(UploadedFile $archivo, string $rutaDestino, int $anchoDestino, int $altoDestino): bool
+    {
+        if (! extension_loaded('gd')) {
+            return false;
+        }
+
+        $rutaOrigen = $archivo->getRealPath();
+
+        if (! $rutaOrigen || ! file_exists($rutaOrigen)) {
+            return false;
+        }
+
+        $info = @getimagesize($rutaOrigen);
+
+        if (! $info || empty($info['mime'])) {
+            return false;
+        }
+
+        $imagenOriginal = match ($info['mime']) {
+            'image/jpeg' => @imagecreatefromjpeg($rutaOrigen),
+            'image/png' => @imagecreatefrompng($rutaOrigen),
+            'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($rutaOrigen) : false,
+            default => false,
+        };
+
+        if (! $imagenOriginal) {
+            return false;
+        }
+
+        $anchoOriginal = imagesx($imagenOriginal);
+        $altoOriginal = imagesy($imagenOriginal);
+
+        if ($anchoOriginal <= 0 || $altoOriginal <= 0) {
+            imagedestroy($imagenOriginal);
+            return false;
+        }
+
+        $escala = max($anchoDestino / $anchoOriginal, $altoDestino / $altoOriginal);
+
+        $nuevoAncho = (int) ceil($anchoOriginal * $escala);
+        $nuevoAlto = (int) ceil($altoOriginal * $escala);
+
+        $posicionX = (int) (($anchoDestino - $nuevoAncho) / 2);
+        $posicionY = (int) (($altoDestino - $nuevoAlto) / 2);
+
+        $canvas = imagecreatetruecolor($anchoDestino, $altoDestino);
+
+        $fondo = imagecolorallocate($canvas, 245, 241, 233);
+        imagefill($canvas, 0, 0, $fondo);
+
+        imagecopyresampled(
+            $canvas,
+            $imagenOriginal,
+            $posicionX,
+            $posicionY,
+            0,
+            0,
+            $nuevoAncho,
+            $nuevoAlto,
+            $anchoOriginal,
+            $altoOriginal
+        );
+
+        $guardado = imagejpeg($canvas, $rutaDestino, 88);
+
+        imagedestroy($imagenOriginal);
+        imagedestroy($canvas);
+
+        return $guardado;
     }
 
     private function eliminarImagenPublica(?string $archivo, string $carpetaRelativa): void
     {
-        if (! $archivo || ! str_starts_with($archivo, 'admin-') && ! str_starts_with($archivo, 'hero-admin-')) {
+        if (! $archivo) {
+            return;
+        }
+
+        if (! str_starts_with($archivo, 'admin-') && ! str_starts_with($archivo, 'hero-admin-')) {
             return;
         }
 
         $ruta = public_path($carpetaRelativa . $archivo);
+
         if (File::exists($ruta)) {
             File::delete($ruta);
         }
@@ -366,7 +550,10 @@ class ControladorAdminDashboard extends Controller
 
     private function obtenerCitasPorFecha(Carbon $fecha, string $busqueda = ''): Collection
     {
-        return $this->consultaCitas($busqueda)->where('fecha_cita', $fecha->format('Y-m-d'))->orderBy('hora_inicio')->get();
+        return $this->consultaCitas($busqueda)
+            ->where('fecha_cita', $fecha->format('Y-m-d'))
+            ->orderBy('hora_inicio')
+            ->get();
     }
 
     private function consultaCitas(string $busqueda = '')
@@ -392,20 +579,46 @@ class ControladorAdminDashboard extends Controller
     private function agruparCitasPorTiempo(Collection $citas): Collection
     {
         $hoy = Carbon::today();
+
         $inicioSemana = $hoy->copy()->startOfWeek(Carbon::MONDAY);
         $finSemana = $hoy->copy()->endOfWeek(Carbon::SUNDAY);
+
         $inicioSemanaPasada = $inicioSemana->copy()->subWeek();
         $finSemanaPasada = $finSemana->copy()->subWeek();
+
         $inicioMesAnterior = $hoy->copy()->subMonthNoOverflow()->startOfMonth();
         $finMesAnterior = $hoy->copy()->subMonthNoOverflow()->endOfMonth();
 
-        return $citas->groupBy(function (Cita $cita) use ($inicioSemana, $finSemana, $inicioSemanaPasada, $finSemanaPasada, $inicioMesAnterior, $finMesAnterior) {
+        return $citas->groupBy(function (Cita $cita) use (
+            $inicioSemana,
+            $finSemana,
+            $inicioSemanaPasada,
+            $finSemanaPasada,
+            $inicioMesAnterior,
+            $finMesAnterior
+        ) {
             $fecha = Carbon::parse($cita->fecha_cita);
-            if ($fecha->isToday()) return 'Citas de hoy';
-            if ($fecha->isFuture()) return 'Próximas citas';
-            if ($fecha->betweenIncluded($inicioSemana, $finSemana)) return 'Citas de esta semana';
-            if ($fecha->betweenIncluded($inicioSemanaPasada, $finSemanaPasada)) return 'Citas de la semana pasada';
-            if ($fecha->betweenIncluded($inicioMesAnterior, $finMesAnterior)) return 'Citas del anterior mes';
+
+            if ($fecha->isToday()) {
+                return 'Citas de hoy';
+            }
+
+            if ($fecha->isFuture()) {
+                return 'Próximas citas';
+            }
+
+            if ($fecha->betweenIncluded($inicioSemana, $finSemana)) {
+                return 'Citas de esta semana';
+            }
+
+            if ($fecha->betweenIncluded($inicioSemanaPasada, $finSemanaPasada)) {
+                return 'Citas de la semana pasada';
+            }
+
+            if ($fecha->betweenIncluded($inicioMesAnterior, $finMesAnterior)) {
+                return 'Citas del anterior mes';
+            }
+
             return 'Citas anteriores';
         });
     }

@@ -1,0 +1,45 @@
+.nav-icono-inline {
+    width: 21px;
+    height: 21px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: currentColor;
+    flex-shrink: 0;
+}
+
+.nav-icono-inline svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.enlaces-navegacion a,
+.enlaces-navegacion .boton-enlace {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.boton-registro-navbar {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 12px;
+    padding-inline: 24px !important;
+    white-space: nowrap;
+}
+
+.boton-registro-navbar span {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+    .nav-icono-inline {
+        display: none;
+    }
+
+    .boton-registro-navbar {
+        padding-inline: 18px !important;
+    }
+}
