@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Http\Controllers\Controller;
 use App\Models\Cita;
 use App\Models\Cliente;
@@ -380,30 +380,27 @@ public function eliminarTrabajador(Trabajador $trabajador): RedirectResponse
         });
     }
 
-    private function guardarImagen(Request $request, string $campo, string $carpeta, string $prefijo): string
-    {
-        $archivo = $request->file($campo);
-        $destino = public_path('images/' . $carpeta);
-
-        File::ensureDirectoryExists($destino);
-
-        $medidas = $this->medidasImagenPorPrefijo($prefijo);
-
-        $nombre = $prefijo . '-' . uniqid() . '.jpg';
-        $rutaDestino = $destino . DIRECTORY_SEPARATOR . $nombre;
-
-        if ($archivo instanceof UploadedFile && $this->procesarImagenProfesional($archivo, $rutaDestino, $medidas['ancho'], $medidas['alto'])) {
-            return $nombre;
-        }
-
-        $extension = $archivo?->getClientOriginalExtension() ?: 'jpg';
-        $nombreFallback = $prefijo . '-' . uniqid() . '.' . $extension;
-
-        $archivo->move($destino, $nombreFallback);
-
-        return $nombreFallback;
+private function guardarImagen(Request $request, string $campo, string $carpeta, string $prefijo): string
+{
+    if (! $request->hasFile($campo)) {
+        return '';
     }
 
+    $archivo = $request->file($campo);
+
+    $nombreArchivo = $prefijo . '-' . uniqid();
+
+    $resultado = Cloudinary::upload(
+        $archivo->getRealPath(),
+        [
+            'folder' => 'marly-centro-belleza/' . $carpeta,
+            'public_id' => $nombreArchivo,
+            'overwrite' => false,
+        ]
+    );
+
+    return $resultado->getSecurePath();
+}
     private function medidasImagenPorPrefijo(string $prefijo): array
     {
         return match ($prefijo) {
@@ -510,6 +507,10 @@ private function eliminarImagenPublica(?string $archivo, string $carpetaRelativa
         return;
     }
 
+    if (str_starts_with($archivo, 'http')) {
+        return;
+    }
+
     $imagenesProtegidas = [
         'default-service.jpg',
         'manicure.jpg',
@@ -518,27 +519,12 @@ private function eliminarImagenPublica(?string $archivo, string $carpetaRelativa
         'tinte.jpg',
         'maquillaje.jpg',
         'depilacion.jpg',
-        'corte.jpg',
-        'duena.jpg',
-        'estilista1.jpg',
-        'estilista2.jpg',
-        'estilista3.jpg',
-        'estilista4.jpg',
-        'estilista5.jpg',
-        'estilista6.jpg',
-        'estilista7.jpg',
+        'default-worker.jpg',
+        'trabajador-default.jpg',
+        'estilista-default.jpg',
     ];
 
     if (in_array($archivo, $imagenesProtegidas, true)) {
-        return;
-    }
-
-    $esImagenAdministrativa =
-        str_starts_with($archivo, 'admin-service-') ||
-        str_starts_with($archivo, 'admin-worker-') ||
-        str_starts_with($archivo, 'hero-admin-');
-
-    if (! $esImagenAdministrativa) {
         return;
     }
 

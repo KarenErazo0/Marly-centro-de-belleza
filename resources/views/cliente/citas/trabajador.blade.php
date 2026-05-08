@@ -45,13 +45,14 @@
                                 @foreach($grupo['trabajadores'] as $trabajador)
                                     @php
                                         $checked = data_get($reserva, 'trabajadores.' . $grupo['clave']) == $trabajador->id_trabajador;
+                                        $fotoTrabajador = $trabajador->foto ?? 'default-service.jpg';
                                     @endphp
 
                                     <label class="tarjeta-trabajador tarjeta-trabajador-opcion {{ $checked ? 'seleccionado' : '' }}" data-grupo="{{ $grupo['clave'] }}">
                                         <input type="radio" name="trabajadores[{{ $grupo['clave'] }}]" value="{{ $trabajador->id_trabajador }}" {{ $checked ? 'checked' : '' }}>
 
                                         <div class="imagen-trabajador">
-                                            <img src="{{ asset('images/services/' . ($trabajador->foto ?? 'default-service.jpg')) }}" alt="{{ $trabajador->nombre_completo }}" onerror="this.onerror=null;this.src='{{ asset('images/services/default-service.jpg') }}';">
+                                            <img src="{{ str_starts_with($fotoTrabajador, 'http') ? $fotoTrabajador : asset('images/services/' . $fotoTrabajador) }}" alt="{{ $trabajador->nombre_completo }}" onerror="this.onerror=null;this.src='{{ asset('images/services/default-service.jpg') }}';">
                                         </div>
 
                                         <div class="contenido-trabajador">

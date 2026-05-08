@@ -22,12 +22,15 @@
             @csrf
             <div class="rejilla-servicios-reserva">
                 @foreach($servicios as $servicio)
-                    @php $seleccionado = in_array($servicio->id_servicio, $reserva['servicios'] ?? []); @endphp
+                    @php
+                        $seleccionado = in_array($servicio->id_servicio, $reserva['servicios'] ?? []);
+                        $imagenServicio = $servicio->imagen ?? 'default-service.jpg';
+                    @endphp
                     <label class="tarjeta-servicio-reserva {{ $seleccionado ? 'seleccionado' : '' }}">
                         <input type="checkbox" name="servicios[]" value="{{ $servicio->id_servicio }}" {{ $seleccionado ? 'checked' : '' }}>
                         <div class="caja-imagen-servicio-reserva">
                             <img
-                                src="{{ asset('images/services/' . ($servicio->imagen ?? 'default-service.jpg')) }}"
+                                src="{{ str_starts_with($imagenServicio, 'http') ? $imagenServicio : asset('images/services/' . $imagenServicio) }}"
                                 alt="{{ $servicio->nombre_servicio }}"
                                 onerror="this.onerror=null;this.src='{{ asset('images/services/default-service.jpg') }}';"
                             >

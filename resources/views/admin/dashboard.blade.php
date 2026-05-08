@@ -3,9 +3,11 @@
     $tabVisual = $tabActivo;
     $adminEmail = session('admin_correo', 'admin@marly.com');
     $heroImagen = $configuracion->hero_imagen ?: 'default-service.jpg';
-    $heroRuta = str_starts_with($heroImagen, 'hero-admin-')
-        ? asset('images/site/' . $heroImagen)
-        : asset('images/services/' . $heroImagen);
+    $heroRuta = str_starts_with($heroImagen, 'http')
+        ? $heroImagen
+        : (str_starts_with($heroImagen, 'hero-admin-')
+            ? asset('images/site/' . $heroImagen)
+            : asset('images/services/' . $heroImagen));
 @endphp
 <!DOCTYPE html>
 <html lang="es">
@@ -60,9 +62,22 @@
         </nav>
 
         <div class="admin-sidebar-bottom">
-            
+            <a class="admin-sidebar-link" href="{{ route('admin.dashboard', ['tab' => 'configuracion']) }}">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z" />
+                    <path
+                        d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.2.37.55.6 1 .6H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1.4Z" />
+                </svg>
+                <span>Configuración</span>
+            </a>
 
-            
+            <a class="admin-sidebar-link" href="#">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 18h.01M9.1 9a3 3 0 1 1 5.8 1c-.45 1.14-1.6 1.62-2.25 2.35-.45.5-.65.95-.65 1.65" />
+                    <circle cx="12" cy="12" r="10" />
+                </svg>
+                <span>Ayuda</span>
+            </a>
         </div>
     </aside>
 
@@ -160,11 +175,9 @@
                                     trabajador{{ $servicio->trabajadores->count() === 1 ? '' : 'es' }}</p>
                             </div>
                             <div class="worker-section-actions">
-                                <button type="button" class="admin-mini-btn compact"
-                                    data-open-modal="modal-editar-seccion-{{ $servicio->id_servicio }}">
-                                    <span class="edit-icon" aria-hidden="true">✎</span>
-                                    <span>Editar</span>
-                                </button>
+                                <button type="button" class="admin-mini-btn"
+                                    data-open-modal="modal-editar-seccion-{{ $servicio->id_servicio }}">✎ Editar
+                                    sección</button>
                                 <form action="{{ route('admin.personal.secciones.eliminar', $servicio) }}"
                                     method="POST" class="inline-form">
                                     @csrf
@@ -185,7 +198,10 @@
                         <div class="worker-grid">
                             @foreach ($servicio->trabajadores as $trabajador)
                                 <article class="worker-card">
-                                    <img src="{{ asset('images/services/' . ($trabajador->foto ?: 'default-service.jpg')) }}"
+                                    @php
+                                        $fotoTrabajador = $trabajador->foto ?: 'default-service.jpg';
+                                    @endphp
+                                    <img src="{{ str_starts_with($fotoTrabajador, 'http') ? $fotoTrabajador : asset('images/services/' . $fotoTrabajador) }}"
                                         alt="{{ $trabajador->nombre_completo }}"
                                         onerror="this.onerror=null;this.src='{{ asset('images/services/default-service.jpg') }}';">
                                     <h3>{{ $trabajador->nombre_completo }}</h3>
@@ -245,7 +261,10 @@
                 @forelse($servicios as $servicio)
                     <article class="admin-service-card">
                         <div class="admin-service-image">
-                            <img src="{{ asset('images/services/' . ($servicio->imagen ?: 'default-service.jpg')) }}"
+                            @php
+                                $imagenServicio = $servicio->imagen ?: 'default-service.jpg';
+                            @endphp
+                            <img src="{{ str_starts_with($imagenServicio, 'http') ? $imagenServicio : asset('images/services/' . $imagenServicio) }}"
                                 alt="{{ $servicio->nombre_servicio }}"
                                 onerror="this.onerror=null;this.src='{{ asset('images/services/default-service.jpg') }}';">
                             <span
@@ -294,6 +313,9 @@
                     <div class="admin-empty-wide">No hay servicios registrados.</div>
                 @endforelse
             </section>
+
+            <div class="admin-pagination-note">Mostrando 1 a {{ $servicios->count() }} de {{ $servicios->count() }}
+                servicios <span>‹</span><b>1</b><span>›</span></div>
 
         @endif
 
