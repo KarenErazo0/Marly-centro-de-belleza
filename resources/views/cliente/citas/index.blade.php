@@ -26,7 +26,8 @@
                     <path d="m21 21-4.35-4.35"></path>
                 </svg>
 
-                <input type="search" name="buscar" value="{{ $busqueda }}" placeholder="Buscar por servicio, nombre o teléfono. Ej: manicure">
+                <input type="search" name="buscar" value="{{ $busqueda }}"
+                    placeholder="Buscar por servicio, nombre o teléfono. Ej: manicure">
             </div>
 
             <button type="submit" class="boton boton-primario">Buscar</button>
@@ -57,8 +58,14 @@
                         <div class="rejilla-citas-registradas rejilla-mis-citas">
                             @foreach($citasGrupo as $cita)
                                 @php
-                                    $inicioCita = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $cita->fecha_cita . ' ' . $cita->hora_inicio);
-                                    $puedeGestionarse = $inicioCita->isFuture() && in_array($cita->estado, ['registrada', 'confirmada'], true);
+                                    $inicioCita = \Carbon\Carbon::createFromFormat(
+                                        'Y-m-d H:i:s',
+                                        $cita->fecha_cita . ' ' . $cita->hora_inicio
+                                    );
+
+                                    $puedeGestionarse =
+                                        $inicioCita->isFuture() &&
+                                        in_array($cita->estado, ['registrada', 'confirmada'], true);
 
                                     $estadoTexto = match($cita->estado) {
                                         'completada' => 'Cita cumplida',
@@ -74,9 +81,26 @@
                                         default => $inicioCita->isPast() ? 'estado-pasada' : 'estado-pendiente',
                                     };
 
-                                    $profesionales = $cita->detalles->pluck('trabajador.nombre_completo')->filter()->unique()->values();
+                                    $mensajeNoGestionable = match($cita->estado) {
+                                        'cancelada' => 'Esta cita ya fue cancelada, por eso no se puede modificar ni eliminar.',
+                                        'completada' => 'Esta cita ya fue cumplida, por eso no se puede modificar ni eliminar.',
+                                        'inasistencia' => 'Esta cita quedó registrada como inasistencia, por eso no se puede modificar ni eliminar.',
+                                        default => $inicioCita->isPast()
+                                            ? 'Esta cita ya pasó, por eso no se puede modificar ni eliminar.'
+                                            : 'Esta cita no se puede modificar ni eliminar en este momento.',
+                                    };
+
+                                    $profesionales = $cita->detalles
+                                        ->pluck('trabajador.nombre_completo')
+                                        ->filter()
+                                        ->unique()
+                                        ->values();
+
                                     $servicios = $cita->servicios->pluck('nombre_servicio')->join(', ') ?: 'Servicio';
-                                    $profesionalTexto = $profesionales->isNotEmpty() ? $profesionales->join(', ') : optional($cita->trabajador)->nombre_completo;
+
+                                    $profesionalTexto = $profesionales->isNotEmpty()
+                                        ? $profesionales->join(', ')
+                                        : optional($cita->trabajador)->nombre_completo;
                                 @endphp
 
                                 <article class="tarjeta-cita-registrada tarjeta-cita-limpia tarjeta-cita-con-menu tarjeta-mis-citas">
@@ -102,7 +126,13 @@
                                         </div>
                                     @else
                                         <div class="menu-cita-cliente menu-cita-solo-icono">
-                                            <button type="button" class="boton-menu-cita" aria-label="Opciones de cita">•••</button>
+                                            <button type="button"
+                                                class="boton-menu-cita marly-info-cita"
+                                                aria-label="Información de cita"
+                                                data-info-title="Cita no disponible"
+                                                data-info-message="{{ $mensajeNoGestionable }}">
+                                                •••
+                                            </button>
                                         </div>
                                     @endif
 
@@ -113,7 +143,8 @@
 
                                     <div class="detalle-cita-grid detalle-mis-citas">
                                         <p>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M20 21a8 8 0 0 0-16 0"></path>
                                                 <circle cx="12" cy="7" r="4"></circle>
                                             </svg>
@@ -122,7 +153,8 @@
                                         </p>
 
                                         <p>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                                                 <rect x="3" y="4" width="18" height="18" rx="2"></rect>
                                                 <path d="M16 2v4"></path>
                                                 <path d="M8 2v4"></path>
@@ -133,12 +165,17 @@
                                         </p>
 
                                         <p>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <path d="M12 6v6l4 2"></path>
                                             </svg>
                                             <strong>Hora:</strong>
-                                            <span>{{ \Carbon\Carbon::createFromFormat('H:i:s', $cita->hora_inicio)->translatedFormat('h:i A') }} - {{ \Carbon\Carbon::createFromFormat('H:i:s', $cita->hora_fin)->translatedFormat('h:i A') }}</span>
+                                            <span>
+                                                {{ \Carbon\Carbon::createFromFormat('H:i:s', $cita->hora_inicio)->translatedFormat('h:i A') }}
+                                                -
+                                                {{ \Carbon\Carbon::createFromFormat('H:i:s', $cita->hora_fin)->translatedFormat('h:i A') }}
+                                            </span>
                                         </p>
                                     </div>
 

@@ -209,59 +209,6 @@
 }
 
 .marly-cuenta-eliminar {
-    border-color: rgba(202, 63, 91, .18) !important;
-}
-
-.marly-cuenta-eliminar-header {
-    display: flex !important;
-    gap: 18px !important;
-    align-items: flex-start !important;
-    margin-bottom: 20px !important;
-}
-
-.marly-cuenta-eliminar-icono {
-    width: 58px !important;
-    height: 58px !important;
-    border-radius: 50% !important;
-    background: rgba(202, 63, 91, .08) !important;
-    color: #c83f5b !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 0 58px !important;
-}
-
-.marly-cuenta-eliminar-icono svg {
-    width: 30px !important;
-    height: 30px !important;
-}
-
-.marly-cuenta-eliminar h2 {
-    margin: 0 0 6px !important;
-    font-size: 1.05rem !important;
-    color: #2d2024 !important;
-}
-
-.marly-cuenta-eliminar p {
-    margin: 0 !important;
-    color: #5f646d !important;
-    line-height: 1.5 !important;
-    font-size: .9rem !important;
-}
-
-.marly-cuenta-confirmacion {
-    min-height: 48px !important;
-    border-radius: 8px !important;
-    border: 1px solid rgba(201, 166, 70, .18) !important;
-    padding: 0 16px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    color: #2d2024 !important;
-    background: #ffffff !important;
-}
-
-.marly-cuenta-eliminar {
     border-color: rgba(201, 166, 70, .16) !important;
     border-radius: 13px !important;
     padding: 28px 28px 26px !important;
@@ -534,5 +481,237 @@ html.modo-oscuro .marly-cuenta-banner-icono,
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+/* ===== Panel edición compacto premium - Mi cuenta ===== */
+.marly-panel-edicion-premium {
+    max-width: 980px !important;
+    padding: 28px !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(201, 166, 70, .18) !important;
+    box-shadow: 0 14px 34px rgba(33, 19, 23, .07) !important;
+}
+
+.marly-edicion-header {
+    padding-bottom: 18px !important;
+    margin-bottom: 22px !important;
+    border-bottom: 1px solid rgba(201, 166, 70, .16) !important;
+}
+
+.marly-edicion-header h2 {
+    margin: 0 0 5px !important;
+    color: #2d2024 !important;
+    font-size: 1.08rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-edicion-header p {
+    margin: 0 !important;
+    color: #5f646d !important;
+    font-size: .9rem !important;
+}
+
+.marly-edicion-form {
+    display: grid !important;
+    gap: 18px !important;
+}
+
+.marly-edicion-fila {
+    display: grid !important;
+    grid-template-columns: 245px minmax(0, 1fr) !important;
+    gap: 22px !important;
+    align-items: center !important;
+}
+
+.marly-edicion-info {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) !important;
+    gap: 14px !important;
+    align-items: center !important;
+}
+
+.marly-edicion-icono {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    background: #fffaf0 !important;
+    color: var(--color-primario) !important;
+    border: 1px solid rgba(201, 166, 70, .2) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.marly-edicion-icono svg {
+    width: 22px !important;
+    height: 22px !important;
+}
+
+.marly-edicion-info label {
+    display: block !important;
+    margin: 0 0 3px !important;
+    color: #2d2024 !important;
+    font-size: .88rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-edicion-info small {
+    display: block !important;
+    color: #5f646d !important;
+    font-size: .76rem !important;
+    line-height: 1.35 !important;
+}
+
+.marly-edicion-fila input {
+    width: 100% !important;
+    height: 48px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(201, 166, 70, .20) !important;
+    background: #ffffff !important;
+    color: #2d2024 !important;
+    padding: 0 16px !important;
+    font-size: .9rem !important;
+    outline: none !important;
+    transition: .2s ease !important;
+}
+
+.marly-edicion-fila input:focus {
+    border-color: var(--color-primario) !important;
+    box-shadow: 0 0 0 4px rgba(201, 166, 70, .12) !important;
+}
+
+.marly-edicion-password {
+    position: relative !important;
+}
+
+.marly-edicion-password input {
+    padding-right: 48px !important;
+}
+
+.marly-edicion-password small {
+    display: block !important;
+    margin-top: 7px !important;
+    color: #5f646d !important;
+    font-size: .74rem !important;
+}
+
+.marly-toggle-password {
+    position: absolute !important;
+    top: 13px !important;
+    right: 14px !important;
+    width: 23px !important;
+    height: 23px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #8b8f98 !important;
+    cursor: pointer !important;
+}
+
+.marly-toggle-password svg {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+.marly-toggle-password:hover {
+    color: var(--color-primario) !important;
+}
+
+.marly-edicion-footer {
+    margin-top: 4px !important;
+    padding-top: 18px !important;
+    border-top: 1px solid rgba(201, 166, 70, .16) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 22px !important;
+    flex-wrap: wrap !important;
+}
+
+.marly-edicion-guardar {
+    min-height: 46px !important;
+    padding: 0 24px !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    background: var(--color-primario) !important;
+    color: #1A1A1A !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 9px !important;
+    font-size: .9rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: .22s ease !important;
+}
+
+.marly-edicion-guardar svg {
+    width: 18px !important;
+    height: 18px !important;
+}
+
+.marly-edicion-guardar:hover {
+    transform: translateY(-2px) !important;
+    background: var(--color-hover) !important;
+    box-shadow: 0 14px 28px rgba(201, 166, 70, .18) !important;
+}
+
+.marly-edicion-footer p {
+    margin: 0 !important;
+    color: #5f646d !important;
+    font-size: .82rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.marly-edicion-footer p span {
+    color: var(--color-primario) !important;
+    font-weight: 800 !important;
+}
+
+/* Modo oscuro */
+[data-theme="dark"] .marly-panel-edicion-premium {
+    background: #222222 !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+[data-theme="dark"] .marly-edicion-header h2,
+[data-theme="dark"] .marly-edicion-info label {
+    color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .marly-edicion-header p,
+[data-theme="dark"] .marly-edicion-info small,
+[data-theme="dark"] .marly-edicion-password small,
+[data-theme="dark"] .marly-edicion-footer p {
+    color: #cfcfcf !important;
+}
+
+[data-theme="dark"] .marly-edicion-icono {
+    background: #2b2b2b !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+[data-theme="dark"] .marly-edicion-fila input {
+    background: #2b2b2b !important;
+    color: #f5f5f5 !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+/* Responsive */
+@media (max-width: 850px) {
+    .marly-edicion-fila {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    .marly-edicion-footer {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .marly-edicion-guardar {
+        width: 100% !important;
     }
 }

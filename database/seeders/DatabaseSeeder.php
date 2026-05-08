@@ -92,19 +92,19 @@ class DatabaseSeeder extends Seeder
                 'servicios' => ['Manicure semipermanente', 'Pedicure spa'],
             ],
             [
-                'nombre_completo' => 'Valentina Coral',
+                'nombre_completo' => 'Mark Smith',
                 'especialidad' => 'Técnica de uñas',
                 'foto' => 'estilista4.jpg',
                 'servicios' => ['Manicure semipermanente', 'Pedicure spa'],
             ],
             [
-                'nombre_completo' => 'Laura Martínez',
+                'nombre_completo' => 'Patrick James',
                 'especialidad' => 'Estilista senior',
                 'foto' => 'estilista5.jpg',
                 'servicios' => ['Peinado social', 'Tinte completo'],
             ],
             [
-                'nombre_completo' => 'Ana Rodríguez',
+                'nombre_completo' => 'Patrick James',
                 'especialidad' => 'Maquillaje profesional',
                 'foto' => 'estilista5.jpg',
                 'servicios' => ['Maquillaje profesional', 'Peinado social'],

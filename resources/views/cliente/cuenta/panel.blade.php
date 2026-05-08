@@ -101,44 +101,141 @@
                 </form>
             </div>
 
-            <div class="tarjeta-cuenta panel-edicion-cuenta marly-cuenta-card" id="panel-edicion-cuenta">
-                <h2>Modificar datos de la cuenta</h2>
+            <div class="tarjeta-cuenta panel-edicion-cuenta marly-cuenta-card marly-panel-edicion-premium"
+                id="panel-edicion-cuenta">
+                <div class="marly-edicion-header">
+                    <h2>Editar datos personales</h2>
+                    <p>Actualiza tu información personal y de contacto.</p>
+                </div>
 
-                <form method="POST" action="{{ route('cliente.cuenta.actualizar') }}" class="rejilla-formulario">
+                <form method="POST" action="{{ route('cliente.cuenta.actualizar') }}" class="marly-edicion-form">
                     @csrf
                     @method('PUT')
 
-                    <div class="grupo-campo">
-                        <label for="nombre_completo">Nombre completo</label>
+                    <div class="marly-edicion-fila">
+                        <div class="marly-edicion-info">
+                            <span class="marly-edicion-icono">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M20 21a8 8 0 0 0-16 0"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </span>
+                            <div>
+                                <label for="nombre_completo">Nombre completo</label>
+                                <small>Ingresa tu nombre y apellido.</small>
+                            </div>
+                        </div>
+
                         <input type="text" id="nombre_completo" name="nombre_completo"
                             value="{{ old('nombre_completo', $cliente->nombre_completo) }}" required>
                     </div>
 
-                    <div class="grupo-campo">
-                        <label for="correo_electronico">Correo electrónico</label>
+                    <div class="marly-edicion-fila">
+                        <div class="marly-edicion-info">
+                            <span class="marly-edicion-icono">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M4 4h16v16H4z"></path>
+                                    <path d="m22 6-10 7L2 6"></path>
+                                </svg>
+                            </span>
+                            <div>
+                                <label for="correo_electronico">Correo electrónico</label>
+                                <small>Este será tu usuario para iniciar sesión.</small>
+                            </div>
+                        </div>
+
                         <input type="email" id="correo_electronico" name="correo_electronico"
                             value="{{ old('correo_electronico', $cliente->correo_electronico) }}" required>
                     </div>
 
-                    <div class="grupo-campo">
-                        <label for="telefono">Teléfono</label>
+                    <div class="marly-edicion-fila">
+                        <div class="marly-edicion-info">
+                            <span class="marly-edicion-icono">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path
+                                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.32 1.77.59 2.61a2 2 0 0 1-.45 2.11L8 9.69a16 16 0 0 0 6.31 6.31l1.25-1.25a2 2 0 0 1 2.11-.45c.84.27 1.71.47 2.61.59A2 2 0 0 1 22 16.92z">
+                                    </path>
+                                </svg>
+                            </span>
+                            <div>
+                                <label for="telefono">Teléfono</label>
+                                <small>Ingresa tu número de teléfono de contacto.</small>
+                            </div>
+                        </div>
+
                         <input type="text" id="telefono" name="telefono"
                             value="{{ old('telefono', $cliente->telefono) }}" required>
                     </div>
 
-                    <div class="grupo-campo">
-                        <label for="contrasena">Nueva contraseña (opcional)</label>
-                        <input type="password" id="contrasena" name="contrasena" minlength="8">
-                        <small class="ayuda-campo">Si deseas cambiarla, usa mínimo 8 caracteres.</small>
+                    <div class="marly-edicion-fila">
+                        <div class="marly-edicion-info">
+                            <span class="marly-edicion-icono">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                                    <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+                                </svg>
+                            </span>
+                            <div>
+                                <label for="contrasena">Nueva contraseña (opcional)</label>
+                                <small>Deja en blanco si no deseas cambiar tu contraseña.</small>
+                            </div>
+                        </div>
+
+                        <div class="marly-edicion-password">
+                            <input type="password" id="contrasena" name="contrasena" minlength="8"
+                                placeholder="Ingresa tu nueva contraseña">
+                            <button type="button" class="marly-toggle-password" data-password-target="contrasena"
+                                aria-label="Mostrar contraseña">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                            <small>La contraseña debe tener mínimo 8 caracteres.</small>
+                        </div>
                     </div>
 
-                    <div class="grupo-campo">
-                        <label for="contrasena_confirmation">Confirmar nueva contraseña</label>
-                        <input type="password" id="contrasena_confirmation" name="contrasena_confirmation" minlength="8">
+                    <div class="marly-edicion-fila">
+                        <div class="marly-edicion-info">
+                            <span class="marly-edicion-icono">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                                    <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+                                </svg>
+                            </span>
+                            <div>
+                                <label for="contrasena_confirmation">Confirmar nueva contraseña</label>
+                                <small>Repite tu nueva contraseña.</small>
+                            </div>
+                        </div>
+
+                        <div class="marly-edicion-password">
+                            <input type="password" id="contrasena_confirmation" name="contrasena_confirmation"
+                                minlength="8" placeholder="Confirma tu nueva contraseña">
+                            <button type="button" class="marly-toggle-password"
+                                data-password-target="contrasena_confirmation" aria-label="Mostrar contraseña">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="acciones-formulario">
-                        <button type="submit" class="boton boton-primario">Guardar cambios</button>
+                    <div class="marly-edicion-footer">
+                        <button type="submit" class="marly-edicion-guardar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path>
+                                <path d="M17 21v-8H7v8"></path>
+                                <path d="M7 3v5h8"></path>
+                            </svg>
+                            Guardar cambios
+                        </button>
+
+                        <p>
+                            <span>♡</span>
+                            Tu información está protegida y solo tú puedes verla.
+                        </p>
                     </div>
                 </form>
             </div>

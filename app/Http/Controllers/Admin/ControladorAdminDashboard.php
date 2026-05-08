@@ -79,38 +79,42 @@ class ControladorAdminDashboard extends Controller
         ]);
     }
 
-    public function actualizarConfiguracion(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'contacto_ubicacion' => ['required', 'string', 'max:120'],
-            'contacto_telefono' => ['required', 'string', 'max:30'],
-            'contacto_correo' => ['required', 'email', 'max:120'],
-            'contacto_horario' => ['required', 'string', 'max:500'],
-            'instagram_url' => ['nullable', 'url', 'max:255'],
-            'whatsapp_url' => ['nullable', 'url', 'max:255'],
-            'hero_imagen' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-        ], [], [
-            'hero_imagen' => 'imagen principal',
-            'contacto_ubicacion' => 'ubicación',
-            'contacto_telefono' => 'teléfono',
-            'contacto_correo' => 'correo',
-            'contacto_horario' => 'horario',
-        ]);
+ public function actualizarConfiguracion(Request $request): RedirectResponse
+{
+    $validated = $request->validate([
+        'contacto_ubicacion' => ['required', 'string', 'max:120'],
+        'contacto_telefono' => ['required', 'string', 'max:30'],
+        'contacto_correo' => ['required', 'email', 'max:120'],
+        'contacto_horario' => ['required', 'string', 'max:500'],
+        'instagram_url' => ['nullable', 'url', 'max:255'],
+        'whatsapp_url' => ['nullable', 'url', 'max:255'],
+        'hero_imagen' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+    ], [], [
+        'hero_imagen' => 'imagen principal',
+        'contacto_ubicacion' => 'ubicación',
+        'contacto_telefono' => 'teléfono',
+        'contacto_correo' => 'correo',
+        'contacto_horario' => 'horario',
+    ]);
 
-        $configuracion = $this->configuracionSitio();
+    $configuracion = $this->configuracionSitio();
 
-        if ($request->hasFile('hero_imagen')) {
-            $validated['hero_imagen'] = $this->guardarImagen($request, 'hero_imagen', 'site', 'hero-admin');
-            $this->eliminarImagenPublica($configuracion->hero_imagen, 'images/site/');
-        }
+    if ($request->hasFile('hero_imagen')) {
+        $imagenAnterior = $configuracion->hero_imagen;
+
+        $validated['hero_imagen'] = $this->guardarImagen($request, 'hero_imagen', 'site', 'hero-admin');
 
         $configuracion->fill($validated)->save();
 
-        return redirect()
-            ->route('admin.dashboard', ['tab' => 'configuracion'])
-            ->with('success', 'La página principal fue actualizada correctamente.');
+        $this->eliminarImagenPublica($imagenAnterior, 'images/site/');
+    } else {
+        $configuracion->fill($validated)->save();
     }
 
+    return redirect()
+        ->route('admin.dashboard', ['tab' => 'configuracion'])
+        ->with('success', 'La página principal fue actualizada correctamente.');
+}
     public function guardarServicio(Request $request): RedirectResponse
     {
         $validated = $request->validate($this->reglasServicio(true), [], $this->atributosServicio());
@@ -128,24 +132,28 @@ class ControladorAdminDashboard extends Controller
             ->with('success', 'Servicio agregado correctamente.');
     }
 
-    public function actualizarServicio(Request $request, Servicio $servicio): RedirectResponse
-    {
-        $validated = $request->validate($this->reglasServicio(false), [], $this->atributosServicio());
+public function actualizarServicio(Request $request, Servicio $servicio): RedirectResponse
+{
+    $validated = $request->validate($this->reglasServicio(false), [], $this->atributosServicio());
 
-        if ($request->hasFile('imagen')) {
-            $validated['imagen'] = $this->guardarImagen($request, 'imagen', 'services', 'admin-service');
-            $this->eliminarImagenPublica($servicio->imagen, 'images/services/');
-        }
+    $validated['estado'] = $request->boolean('estado') ? 'activo' : 'inactivo';
 
-        $validated['estado'] = $request->boolean('estado') ? 'activo' : 'inactivo';
+    if ($request->hasFile('imagen')) {
+        $imagenAnterior = $servicio->imagen;
+
+        $validated['imagen'] = $this->guardarImagen($request, 'imagen', 'services', 'admin-service');
 
         $servicio->update($validated);
 
-        return redirect()
-            ->route('admin.dashboard', ['tab' => 'servicios'])
-            ->with('success', 'Servicio actualizado correctamente.');
+        $this->eliminarImagenPublica($imagenAnterior, 'images/services/');
+    } else {
+        $servicio->update($validated);
     }
 
+    return redirect()
+        ->route('admin.dashboard', ['tab' => 'servicios'])
+        ->with('success', 'Servicio actualizado correctamente.');
+}
     public function cambiarEstadoServicio(Servicio $servicio): RedirectResponse
     {
         $servicio->update([
@@ -161,21 +169,22 @@ class ControladorAdminDashboard extends Controller
             ->with('success', $mensaje);
     }
 
-    public function eliminarServicio(Servicio $servicio): RedirectResponse
-    {
-        try {
-            $imagen = $servicio->imagen;
-            $servicio->delete();
+public function eliminarServicio(Servicio $servicio): RedirectResponse
+{
+    try {
+        $imagen = $servicio->imagen;
 
-            $this->eliminarImagenPublica($imagen, 'images/services/');
+        $servicio->delete();
 
-            return redirect()
-                ->route('admin.dashboard', ['tab' => 'servicios'])
-                ->with('success', 'Servicio eliminado completamente del catálogo.');
-        } catch (QueryException $exception) {
-            return back()->with('error', 'No se pudo eliminar el servicio porque está relacionado con registros existentes. Puedes dejarlo inactivo para ocultarlo al cliente.');
-        }
+        $this->eliminarImagenPublica($imagen, 'images/services/');
+
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'servicios'])
+            ->with('success', 'Servicio eliminado completamente del catálogo.');
+    } catch (QueryException $exception) {
+        return back()->with('error', 'No se pudo eliminar el servicio porque está relacionado con registros existentes. Puedes dejarlo inactivo para ocultarlo al cliente.');
     }
+}
 
     public function crearSeccionPersonal(Request $request): RedirectResponse
     {
@@ -246,46 +255,52 @@ class ControladorAdminDashboard extends Controller
             ->with('success', 'Trabajador agregado correctamente.');
     }
 
-    public function actualizarTrabajador(Request $request, Trabajador $trabajador): RedirectResponse
-    {
-        $validated = $request->validate($this->reglasTrabajador(false), [], $this->atributosTrabajador());
+ public function actualizarTrabajador(Request $request, Trabajador $trabajador): RedirectResponse
+{
+    $validated = $request->validate($this->reglasTrabajador(false), [], $this->atributosTrabajador());
 
-        $servicio = Servicio::findOrFail($validated['id_servicio']);
+    $servicio = Servicio::findOrFail($validated['id_servicio']);
 
-        $data = [
-            'nombre_completo' => $validated['nombre_completo'],
-            'especialidad' => $servicio->nombre_servicio,
-        ];
+    $data = [
+        'nombre_completo' => $validated['nombre_completo'],
+        'especialidad' => $servicio->nombre_servicio,
+    ];
 
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $this->guardarImagen($request, 'foto', 'services', 'admin-worker');
-            $this->eliminarImagenPublica($trabajador->foto, 'images/services/');
-        }
+    if ($request->hasFile('foto')) {
+        $fotoAnterior = $trabajador->foto;
+
+        $data['foto'] = $this->guardarImagen($request, 'foto', 'services', 'admin-worker');
 
         $trabajador->update($data);
-        $trabajador->servicios()->sync([$servicio->id_servicio]);
+
+        $this->eliminarImagenPublica($fotoAnterior, 'images/services/');
+    } else {
+        $trabajador->update($data);
+    }
+
+    $trabajador->servicios()->sync([$servicio->id_servicio]);
+
+    return redirect()
+        ->route('admin.dashboard', ['tab' => 'personal'])
+        ->with('success', 'Trabajador actualizado correctamente.');
+}
+
+public function eliminarTrabajador(Trabajador $trabajador): RedirectResponse
+{
+    try {
+        $foto = $trabajador->foto;
+
+        $trabajador->delete();
+
+        $this->eliminarImagenPublica($foto, 'images/services/');
 
         return redirect()
             ->route('admin.dashboard', ['tab' => 'personal'])
-            ->with('success', 'Trabajador actualizado correctamente.');
+            ->with('success', 'Trabajador eliminado correctamente.');
+    } catch (QueryException $exception) {
+        return back()->with('error', 'No se pudo eliminar el trabajador porque tiene citas asociadas. Puedes conservarlo para mantener el historial de citas.');
     }
-
-    public function eliminarTrabajador(Trabajador $trabajador): RedirectResponse
-    {
-        try {
-            $foto = $trabajador->foto;
-            $trabajador->delete();
-
-            $this->eliminarImagenPublica($foto, 'images/services/');
-
-            return redirect()
-                ->route('admin.dashboard', ['tab' => 'personal'])
-                ->with('success', 'Trabajador eliminado correctamente.');
-        } catch (QueryException $exception) {
-            return back()->with('error', 'No se pudo eliminar el trabajador porque tiene citas asociadas. Puedes conservarlo para mantener el historial de citas.');
-        }
-    }
-
+}
     public function eliminarSeccionPersonal(Servicio $servicio): RedirectResponse
     {
         try {
@@ -482,23 +497,50 @@ class ControladorAdminDashboard extends Controller
         return $guardado;
     }
 
-    private function eliminarImagenPublica(?string $archivo, string $carpetaRelativa): void
-    {
-        if (! $archivo) {
-            return;
-        }
-
-        if (! str_starts_with($archivo, 'admin-') && ! str_starts_with($archivo, 'hero-admin-')) {
-            return;
-        }
-
-        $ruta = public_path($carpetaRelativa . $archivo);
-
-        if (File::exists($ruta)) {
-            File::delete($ruta);
-        }
+private function eliminarImagenPublica(?string $archivo, string $carpetaRelativa): void
+{
+    if (! $archivo) {
+        return;
     }
 
+    $imagenesProtegidas = [
+        'default-service.jpg',
+        'manicure.jpg',
+        'pedicure.jpg',
+        'peinado.jpg',
+        'tinte.jpg',
+        'maquillaje.jpg',
+        'depilacion.jpg',
+        'corte.jpg',
+        'duena.jpg',
+        'estilista1.jpg',
+        'estilista2.jpg',
+        'estilista3.jpg',
+        'estilista4.jpg',
+        'estilista5.jpg',
+        'estilista6.jpg',
+        'estilista7.jpg',
+    ];
+
+    if (in_array($archivo, $imagenesProtegidas, true)) {
+        return;
+    }
+
+    $esImagenAdministrativa =
+        str_starts_with($archivo, 'admin-service-') ||
+        str_starts_with($archivo, 'admin-worker-') ||
+        str_starts_with($archivo, 'hero-admin-');
+
+    if (! $esImagenAdministrativa) {
+        return;
+    }
+
+    $ruta = public_path($carpetaRelativa . $archivo);
+
+    if (File::exists($ruta)) {
+        File::delete($ruta);
+    }
+}
     private function reglasServicio(bool $crear): array
     {
         return [

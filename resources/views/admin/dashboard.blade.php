@@ -18,36 +18,39 @@
     @vite(['resources/css/app.css', 'resources/css/paginas/admin.css', 'resources/js/app.js'])
 </head>
 
-<body class="admin-body">
-    <header class="admin-topbar">
-        <a class="admin-brand" href="{{ route('admin.dashboard', ['tab' => 'personal']) }}">
+<body class="admin-body admin-layout-sidebar">
+    <aside class="admin-sidebar">
+        <a class="admin-sidebar-brand" href="{{ route('admin.dashboard', ['tab' => 'servicios']) }}">
             <img src="{{ asset('images/logo-marly.png') }}" alt="Logo Marly Centro de Belleza">
-            <span>Marly Centro de Belleza</span>
+            <span>Marly Centro<br>de Belleza</span>
         </a>
 
-        <nav class="admin-nav" aria-label="Navegación administrativa">
-            <a class="admin-nav-link {{ $tabVisual === 'servicios' ? 'active' : '' }}"
+        <nav class="admin-sidebar-nav" aria-label="Navegación administrativa">
+            <a class="admin-sidebar-link {{ $tabVisual === 'servicios' ? 'active' : '' }}"
                 href="{{ route('admin.dashboard', ['tab' => 'servicios']) }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M6 7V6a3 3 0 0 1 6 0v1m-7 0h14l-1 13H6L5 7Zm9 0V6a3 3 0 0 1 6 0v1" />
                 </svg>
-                <span>Gestión servicio</span>
+                <span>Gestión de servicios</span>
             </a>
-            <a class="admin-nav-link {{ $tabVisual === 'personal' ? 'active' : '' }}"
+
+            <a class="admin-sidebar-link {{ $tabVisual === 'personal' ? 'active' : '' }}"
                 href="{{ route('admin.dashboard', ['tab' => 'personal']) }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-7 9a7 7 0 0 1 14 0" />
                 </svg>
-                <span>Gestión personal</span>
+                <span>Gestión de personal</span>
             </a>
-            <a class="admin-nav-link {{ $tabVisual === 'citas' ? 'active' : '' }}"
+
+            <a class="admin-sidebar-link {{ $tabVisual === 'citas' ? 'active' : '' }}"
                 href="{{ route('admin.dashboard', ['tab' => 'citas']) }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M7 3v4M17 3v4M4 9h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z" />
                 </svg>
-                <span>Gestión citas</span>
+                <span>Gestión de citas</span>
             </a>
-            <a class="admin-nav-link {{ $tabVisual === 'configuracion' ? 'active' : '' }}"
+
+            <a class="admin-sidebar-link {{ $tabVisual === 'configuracion' ? 'active' : '' }}"
                 href="{{ route('admin.dashboard', ['tab' => 'configuracion']) }}">
                 <svg viewBox="0 0 24 24">
                     <path d="M4 5h16v14H4zM8 9h8M8 13h5M17 17h.01" />
@@ -56,7 +59,17 @@
             </a>
         </nav>
 
-        <div class="admin-actions">
+        <div class="admin-sidebar-bottom">
+            
+
+            
+        </div>
+    </aside>
+
+    <header class="admin-sidebar-topbar">
+        <div></div>
+
+        <div class="admin-sidebar-actions">
             <button type="button" class="theme-toggle admin-theme-toggle" id="theme-toggle"
                 aria-label="Cambiar a modo oscuro" title="Cambiar tema">
                 <span class="theme-toggle-track" aria-hidden="true">
@@ -76,18 +89,18 @@
                 </span>
             </button>
 
-            <div class="admin-user" data-admin-menu>
+            <div class="admin-user admin-user-sidebar" data-admin-menu>
                 <button type="button" class="admin-user-button" data-admin-menu-button
                     aria-label="Cuenta administradora">
-                    <span class="admin-user-icon">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-7 9a7 7 0 0 1 14 0" />
-                        </svg>
+                    <span class="admin-user-inicial">
+                        {{ strtoupper(substr($adminEmail, 0, 1)) }}
                     </span>
+                    <span class="admin-user-name">{{ $adminEmail }}</span>
                     <svg class="admin-user-chevron" viewBox="0 0 24 24">
                         <path d="m6 9 6 6 6-6" />
                     </svg>
                 </button>
+
                 <div class="admin-user-dropdown">
                     <strong>{{ $adminEmail }}</strong>
                     <span>Panel admin</span>
@@ -95,8 +108,9 @@
                         @csrf
                         <button type="submit" data-confirm-title="Cerrar sesión"
                             data-confirm-message="¿Quieres cerrar la sesión de administración?"
-                            data-confirm-detail="Volverás a la página de inicio."
-                            data-confirm-action="Cerrar sesión">Cerrar sesión</button>
+                            data-confirm-detail="Volverás a la página de inicio." data-confirm-action="Cerrar sesión">
+                            Cerrar sesión
+                        </button>
                     </form>
                 </div>
             </div>
@@ -146,9 +160,11 @@
                                     trabajador{{ $servicio->trabajadores->count() === 1 ? '' : 'es' }}</p>
                             </div>
                             <div class="worker-section-actions">
-                                <button type="button" class="admin-mini-btn"
-                                    data-open-modal="modal-editar-seccion-{{ $servicio->id_servicio }}">✎ Editar
-                                    sección</button>
+                                <button type="button" class="admin-mini-btn compact"
+                                    data-open-modal="modal-editar-seccion-{{ $servicio->id_servicio }}">
+                                    <span class="edit-icon" aria-hidden="true">✎</span>
+                                    <span>Editar</span>
+                                </button>
                                 <form action="{{ route('admin.personal.secciones.eliminar', $servicio) }}"
                                     method="POST" class="inline-form">
                                     @csrf
@@ -162,7 +178,8 @@
                                                 <path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" />
                                             </svg></span><span>Eliminar sección</span></button>
                                 </form>
-                                <button type="button" class="admin-collapse" aria-label="Contraer sección">⌃</button>
+                                <button type="button" class="admin-collapse"
+                                    aria-label="Contraer sección">⌃</button>
                             </div>
                         </div>
                         <div class="worker-grid">
@@ -237,7 +254,8 @@
                         <div class="service-card-body">
                             <div class="service-meta">
                                 <strong>${{ number_format($servicio->precio, 0, ',', '.') }}</strong><span>{{ $servicio->duracion_minutos }}
-                                    min</span></div>
+                                    min</span>
+                            </div>
                             <h2>{{ $servicio->nombre_servicio }}</h2>
                             <p>{{ $servicio->descripcion }}</p>
                             <div class="service-actions-row">
@@ -276,9 +294,6 @@
                     <div class="admin-empty-wide">No hay servicios registrados.</div>
                 @endforelse
             </section>
-
-            <div class="admin-pagination-note">Mostrando 1 a {{ $servicios->count() }} de {{ $servicios->count() }}
-                servicios <span>‹</span><b>1</b><span>›</span></div>
 
         @endif
 

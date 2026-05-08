@@ -1100,3 +1100,305 @@ html[data-theme="dark"] .encabezado-area-profesional h3,
 html[data-theme="dark"] .grupo-seleccion-horario h3 {
     color: #d7bd6f !important;
 }
+/* ===== Confirmación de reserva premium ===== */
+.marly-confirmacion-premium {
+    width: min(1060px, 94%) !important;
+}
+
+.marly-confirmacion-header {
+    margin-bottom: 24px !important;
+}
+
+.marly-confirmacion-header h1 {
+    margin: 0 0 8px !important;
+    color: #1f2328 !important;
+    font-size: 1.45rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-confirmacion-header p {
+    margin: 0 !important;
+    color: #6d7280 !important;
+    font-size: .92rem !important;
+}
+
+.marly-confirmacion-form {
+    display: grid !important;
+    grid-template-columns: minmax(320px, .86fr) minmax(0, 1fr) !important;
+    gap: 26px !important;
+    align-items: start !important;
+}
+
+.marly-resumen-card,
+.marly-datos-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(201, 166, 70, .16) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 14px 34px rgba(33, 19, 23, .06) !important;
+}
+
+.marly-resumen-card {
+    padding: 24px !important;
+}
+
+.marly-datos-card {
+    padding: 24px !important;
+    display: grid !important;
+    gap: 20px !important;
+}
+
+.marly-resumen-card h2 {
+    margin: 0 0 18px !important;
+    color: #1f2328 !important;
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-resumen-linea {
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 18px !important;
+    padding: 13px 0 !important;
+    border-bottom: 1px solid rgba(201, 166, 70, .14) !important;
+}
+
+.marly-resumen-linea strong {
+    color: #2d2024 !important;
+    font-size: .88rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-resumen-linea span {
+    color: #5f646d !important;
+    font-size: .88rem !important;
+    text-align: right !important;
+}
+
+.marly-aviso-precio {
+    margin-top: 18px !important;
+    padding: 14px 16px !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(201, 166, 70, .20) !important;
+    background: #fffaf0 !important;
+    display: grid !important;
+    grid-template-columns: 24px 1fr !important;
+    gap: 12px !important;
+    align-items: start !important;
+}
+
+.marly-aviso-precio span {
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 50% !important;
+    border: 1.5px solid var(--color-primario) !important;
+    color: var(--color-primario) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: .78rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-aviso-precio p {
+    margin: 0 !important;
+    color: #2d2024 !important;
+    font-size: .82rem !important;
+    line-height: 1.45 !important;
+    font-weight: 600 !important;
+}
+
+.marly-campo-confirmacion {
+    margin: 0 !important;
+}
+
+.marly-campo-confirmacion label {
+    display: block !important;
+    margin-bottom: 9px !important;
+    color: #1f2328 !important;
+    font-size: .88rem !important;
+    font-weight: 800 !important;
+}
+
+.marly-campo-confirmacion input,
+.marly-campo-confirmacion textarea {
+    width: 100% !important;
+    border: 1px solid rgba(201, 166, 70, .20) !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    color: #1f2328 !important;
+    font-size: .9rem !important;
+    outline: none !important;
+    transition: .2s ease !important;
+}
+
+.marly-campo-confirmacion input {
+    min-height: 48px !important;
+    padding: 0 16px !important;
+}
+
+.marly-campo-confirmacion textarea {
+    min-height: 126px !important;
+    padding: 16px !important;
+    resize: vertical !important;
+}
+
+.marly-campo-confirmacion input:focus,
+.marly-campo-confirmacion textarea:focus {
+    border-color: var(--color-primario) !important;
+    box-shadow: 0 0 0 4px rgba(201, 166, 70, .12) !important;
+}
+
+.marly-campo-confirmacion textarea::placeholder {
+    color: #9ca3af !important;
+}
+
+.marly-campo-confirmacion small {
+    display: block !important;
+    margin-top: 8px !important;
+    color: #6d7280 !important;
+    font-size: .78rem !important;
+}
+
+.marly-confirmacion-acciones {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 18px !important;
+    margin-top: 6px !important;
+}
+
+.marly-btn-volver,
+.marly-btn-confirmar {
+    min-height: 44px !important;
+    padding: 0 25px !important;
+    border-radius: 999px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    text-decoration: none !important;
+    font-size: .9rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: .22s ease !important;
+}
+
+.marly-btn-volver {
+    background: #ffffff !important;
+    color: var(--color-primario) !important;
+    border: 1.8px solid var(--color-primario) !important;
+}
+
+.marly-btn-confirmar {
+    min-width: 168px !important;
+    background: var(--color-primario) !important;
+    color: #1A1A1A !important;
+    border: 1.8px solid var(--color-primario) !important;
+}
+
+.marly-btn-volver:hover,
+.marly-btn-confirmar:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 14px 28px rgba(201, 166, 70, .18) !important;
+}
+
+.marly-btn-confirmar:hover {
+    background: var(--color-hover) !important;
+    border-color: var(--color-hover) !important;
+}
+
+/* Modo oscuro */
+[data-theme="dark"] .marly-confirmacion-header h1,
+[data-theme="dark"] .marly-resumen-card h2,
+[data-theme="dark"] .marly-resumen-linea strong,
+[data-theme="dark"] .marly-campo-confirmacion label {
+    color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .marly-confirmacion-header p,
+[data-theme="dark"] .marly-resumen-linea span,
+[data-theme="dark"] .marly-campo-confirmacion small {
+    color: #cfcfcf !important;
+}
+
+[data-theme="dark"] .marly-resumen-card,
+[data-theme="dark"] .marly-datos-card {
+    background: #222222 !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+[data-theme="dark"] .marly-campo-confirmacion input,
+[data-theme="dark"] .marly-campo-confirmacion textarea {
+    background: #2b2b2b !important;
+    color: #f5f5f5 !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+[data-theme="dark"] .marly-aviso-precio {
+    background: #2b2b2b !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+[data-theme="dark"] .marly-aviso-precio p {
+    color: #f5f5f5 !important;
+}
+
+[data-theme="dark"] .marly-btn-volver {
+    background: #222222 !important;
+}
+
+/* Responsive */
+@media (max-width: 850px) {
+    .marly-confirmacion-form {
+        grid-template-columns: 1fr !important;
+    }
+
+    .marly-confirmacion-acciones {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .marly-btn-volver,
+    .marly-btn-confirmar {
+        width: 100% !important;
+    }
+
+    .marly-resumen-linea {
+        flex-direction: column !important;
+        gap: 4px !important;
+    }
+
+    .marly-resumen-linea span {
+        text-align: left !important;
+    }
+}
+/* ===== Marco general confirmación reserva ===== */
+.marly-confirmacion-marco {
+    width: min(1180px, 94%) !important;
+    margin: 0 auto !important;
+    padding: 34px !important;
+    border-radius: 24px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(201, 166, 70, .18) !important;
+    box-shadow: 0 18px 45px rgba(33, 19, 23, .06) !important;
+}
+
+/* Mantiene los pasos actuales dentro del contenedor */
+.marly-confirmacion-marco .pasos-reserva {
+    margin-bottom: 34px !important;
+}
+
+/* Responsive */
+@media (max-width: 850px) {
+    .marly-confirmacion-marco {
+        padding: 22px !important;
+        border-radius: 18px !important;
+    }
+}
+
+/* Modo oscuro */
+[data-theme="dark"] .marly-confirmacion-marco {
+    background: #222222 !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}

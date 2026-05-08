@@ -145,21 +145,6 @@ html[data-theme="dark"] .pie-sitio { background: #121212 !important; }
 }
 
 /* ===== Correcciones visuales finales solicitadas ===== */
-:root {
-    --color-primario: #C9A646;
-    --color-primario-oscuro: #B8962E;
-    --color-hover: #E0C97A;
-}
-
-html[data-theme="dark"] {
-    --color-fondo: #181818;
-    --color-superficie: #262626;
-    --color-superficie-suave: #303030;
-    --color-tarjeta: #343434;
-    --color-borde: #444444;
-    --sombra-suave: 0 18px 45px rgba(0, 0, 0, .34);
-}
-
 /* Logo del navbar: se muestra como círculo completo y centrado */
 .marca-logo {
     width: 52px !important;
@@ -1357,6 +1342,154 @@ html[data-theme="dark"] .marly-user-button {
     .marly-user-dropdown {
         right: -12px !important;
         width: 280px !important;
+    }
+}
+/* ===== Corrección autofill claro / oscuro ===== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #1a1a1a !important;
+    caret-color: #1a1a1a !important;
+    transition: background-color 9999s ease-in-out 0s;
+}
+
+html[data-theme="dark"] input:-webkit-autofill,
+html[data-theme="dark"] input:-webkit-autofill:hover,
+html[data-theme="dark"] input:-webkit-autofill:focus,
+html[data-theme="dark"] textarea:-webkit-autofill,
+html[data-theme="dark"] select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #2b2b2b inset !important;
+    box-shadow: 0 0 0 1000px #2b2b2b inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
+}
+/* =========================================================
+   NOTIFICACIÓN TEMPORAL MARLY DENTRO DE LA PÁGINA
+========================================================= */
+
+.marly-notificacion-temporal {
+    position: relative;
+    z-index: 1;
+
+    width: 100%;
+    max-height: 70px;
+    margin-bottom: 22px;
+    padding: 22px 34px;
+
+    display: flex;
+    align-items: center;
+    gap: 22px;
+
+    background: #fffdf9;
+    border: 1px solid #eadfcf;
+    border-left: 5px solid #d2a63c;
+    border-radius: 16px;
+    box-shadow: 0 18px 45px rgba(42, 31, 26, 0.08);
+
+    animation: marlyNotificacionEntradaInterna 0.35s ease forwards;
+}
+
+.marly-notificacion-temporal.saliendo {
+    animation: marlyNotificacionSalidaInterna 0.45s ease forwards;
+}
+
+.marly-notificacion-icono {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: #d2a63c;
+    color: #ffffff;
+
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.marly-notificacion-contenido {
+    flex: 1;
+}
+
+.marly-notificacion-contenido strong {
+    display: block;
+    margin-bottom: 6px;
+
+    color: #2d2028;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.marly-notificacion-contenido p {
+    margin: 0;
+
+    color: #5e6470;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.marly-notificacion-decoracion {
+    color: #efe3c4;
+    font-size: 52px;
+    line-height: 1;
+}
+
+@keyframes marlyNotificacionEntradaInterna {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes marlyNotificacionSalidaInterna {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+}
+
+@media (max-width: 768px) {
+    .marly-notificacion-temporal {
+        padding: 18px;
+        gap: 14px;
+        min-height: auto;
+    }
+
+    .marly-notificacion-icono {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+        font-size: 24px;
+    }
+
+    .marly-notificacion-contenido strong {
+        font-size: 18px;
+    }
+
+    .marly-notificacion-contenido p {
+        font-size: 14px;
+    }
+
+    .marly-notificacion-decoracion {
+        display: none;
     }
 }
 @import './componentes/navbar-iconos.css';
