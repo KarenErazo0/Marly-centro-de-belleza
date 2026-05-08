@@ -426,76 +426,83 @@ public function eliminarTrabajador(Trabajador $trabajador): RedirectResponse
         };
     }
 
-    private function procesarImagenProfesional(UploadedFile $archivo, string $rutaDestino, int $anchoDestino, int $altoDestino): bool
-    {
-        if (! extension_loaded('gd')) {
-            return false;
-        }
-
-        $rutaOrigen = $archivo->getRealPath();
-
-        if (! $rutaOrigen || ! file_exists($rutaOrigen)) {
-            return false;
-        }
-
-        $info = @getimagesize($rutaOrigen);
-
-        if (! $info || empty($info['mime'])) {
-            return false;
-        }
-
-        $imagenOriginal = match ($info['mime']) {
-            'image/jpeg' => @imagecreatefromjpeg($rutaOrigen),
-            'image/png' => @imagecreatefrompng($rutaOrigen),
-            'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($rutaOrigen) : false,
-            default => false,
-        };
-
-        if (! $imagenOriginal) {
-            return false;
-        }
-
-        $anchoOriginal = imagesx($imagenOriginal);
-        $altoOriginal = imagesy($imagenOriginal);
-
-        if ($anchoOriginal <= 0 || $altoOriginal <= 0) {
-            imagedestroy($imagenOriginal);
-            return false;
-        }
-
-        $escala = max($anchoDestino / $anchoOriginal, $altoDestino / $altoOriginal);
-
-        $nuevoAncho = (int) ceil($anchoOriginal * $escala);
-        $nuevoAlto = (int) ceil($altoOriginal * $escala);
-
-        $posicionX = (int) (($anchoDestino - $nuevoAncho) / 2);
-        $posicionY = (int) (($altoDestino - $nuevoAlto) / 2);
-
-        $canvas = imagecreatetruecolor($anchoDestino, $altoDestino);
-
-        $fondo = imagecolorallocate($canvas, 245, 241, 233);
-        imagefill($canvas, 0, 0, $fondo);
-
-        imagecopyresampled(
-            $canvas,
-            $imagenOriginal,
-            $posicionX,
-            $posicionY,
-            0,
-            0,
-            $nuevoAncho,
-            $nuevoAlto,
-            $anchoOriginal,
-            $altoOriginal
-        );
-
-        $guardado = imagejpeg($canvas, $rutaDestino, 88);
-
-        imagedestroy($imagenOriginal);
-        imagedestroy($canvas);
-
-        return $guardado;
+private function procesarImagenProfesional(UploadedFile $archivo, string $rutaDestino, int $anchoDestino, int $altoDestino): bool
+{
+    if (! extension_loaded('gd')) {
+        return false;
     }
+
+    $rutaOrigen = $archivo->getRealPath();
+
+    if (! $rutaOrigen || ! file_exists($rutaOrigen)) {
+        return false;
+    }
+
+    $info = @getimagesize($rutaOrigen);
+
+    if (! $info || empty($info['mime'])) {
+        return false;
+    }
+
+    $imagenOriginal = false;
+
+    if ($info['mime'] === 'image/jpeg' && function_exists('imagecreatefromjpeg')) {
+        $imagenOriginal = @imagecreatefromjpeg($rutaOrigen);
+    }
+
+    if ($info['mime'] === 'image/png' && function_exists('imagecreatefrompng')) {
+        $imagenOriginal = @imagecreatefrompng($rutaOrigen);
+    }
+
+    if ($info['mime'] === 'image/webp' && function_exists('imagecreatefromwebp')) {
+        $imagenOriginal = @imagecreatefromwebp($rutaOrigen);
+    }
+
+    if (! $imagenOriginal) {
+        return false;
+    }
+
+    $anchoOriginal = imagesx($imagenOriginal);
+    $altoOriginal = imagesy($imagenOriginal);
+
+    if ($anchoOriginal <= 0 || $altoOriginal <= 0) {
+        imagedestroy($imagenOriginal);
+        return false;
+    }
+
+    $escala = max($anchoDestino / $anchoOriginal, $altoDestino / $altoOriginal);
+
+    $nuevoAncho = (int) ceil($anchoOriginal * $escala);
+    $nuevoAlto = (int) ceil($altoOriginal * $escala);
+
+    $posicionX = (int) (($anchoDestino - $nuevoAncho) / 2);
+    $posicionY = (int) (($altoDestino - $nuevoAlto) / 2);
+
+    $canvas = imagecreatetruecolor($anchoDestino, $altoDestino);
+
+    $fondo = imagecolorallocate($canvas, 245, 241, 233);
+    imagefill($canvas, 0, 0, $fondo);
+
+    imagecopyresampled(
+        $canvas,
+        $imagenOriginal,
+        $posicionX,
+        $posicionY,
+        0,
+        0,
+        $nuevoAncho,
+        $nuevoAlto,
+        $anchoOriginal,
+        $altoOriginal
+    );
+
+    $guardado = imagejpeg($canvas, $rutaDestino, 88);
+
+    imagedestroy($imagenOriginal);
+    imagedestroy($canvas);
+
+    return $guardado;
+}
 
 private function eliminarImagenPublica(?string $archivo, string $carpetaRelativa): void
 {
