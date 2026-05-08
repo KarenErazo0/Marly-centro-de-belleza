@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,7 +14,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        setlocale(LC_TIME, 'es_CO.UTF-8', 'es_CO', 'es_ES.UTF-8', 'es_ES', 'Spanish_Spain.1252');
-        Carbon::setLocale('es');
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }
