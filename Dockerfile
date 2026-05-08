@@ -37,6 +37,4 @@ COPY ./apache.conf /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 80
 
-RUN php artisan optimize:clear
-
 CMD ["apache2-foreground"]
