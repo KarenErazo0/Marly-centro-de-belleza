@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Cloudinary\Cloudinary;
 use App\Http\Controllers\Controller;
 use App\Models\Cita;
 use App\Models\Cliente;
@@ -388,9 +388,28 @@ private function guardarImagen(Request $request, string $campo, string $carpeta,
 
     $archivo = $request->file($campo);
 
+    $cloudName = config('services.cloudinary.cloud_name');
+    $apiKey = config('services.cloudinary.api_key');
+    $apiSecret = config('services.cloudinary.api_secret');
+
+    if (! $cloudName || ! $apiKey || ! $apiSecret) {
+        throw new \RuntimeException('Cloudinary no está configurado correctamente.');
+    }
+
+    $cloudinary = new Cloudinary([
+        'cloud' => [
+            'cloud_name' => $cloudName,
+            'api_key' => $apiKey,
+            'api_secret' => $apiSecret,
+        ],
+        'url' => [
+            'secure' => true,
+        ],
+    ]);
+
     $nombreArchivo = $prefijo . '-' . uniqid();
 
-    $resultado = Cloudinary::upload(
+    $resultado = $cloudinary->uploadApi()->upload(
         $archivo->getRealPath(),
         [
             'folder' => 'marly-centro-belleza/' . $carpeta,
@@ -399,7 +418,7 @@ private function guardarImagen(Request $request, string $campo, string $carpeta,
         ]
     );
 
-    return $resultado->getSecurePath();
+    return $resultado['secure_url'];
 }
     private function medidasImagenPorPrefijo(string $prefijo): array
     {
