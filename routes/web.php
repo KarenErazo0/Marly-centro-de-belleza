@@ -24,8 +24,13 @@ Route::prefix('admin')->name('admin.')->middleware('admin.sesion')->group(functi
     Route::delete('/personal/secciones/{servicio}', [ControladorAdminDashboard::class, 'eliminarSeccionPersonal'])->name('personal.secciones.eliminar');
 
     Route::post('/personal/trabajadores', [ControladorAdminDashboard::class, 'guardarTrabajador'])->name('personal.trabajadores.guardar');
-    Route::put('/personal/trabajadores/{trabajador}', [ControladorAdminDashboard::class, 'actualizarTrabajador'])->name('personal.trabajadores.actualizar');
+   Route::put('/personal/secciones/{servicio}/trabajadores/{trabajador}', [ControladorAdminDashboard::class, 'actualizarTrabajador'])
+    ->name('personal.trabajadores.actualizar');
+    Route::post('/personal/trabajadores/{trabajador}/duplicar', [ControladorAdminDashboard::class, 'duplicarTrabajadorEnServicio'])
+    ->name('personal.trabajadores.duplicar');
     Route::patch('/personal/trabajadores/{trabajador}/estado', [ControladorAdminDashboard::class, 'cambiarEstadoTrabajador'])->name('personal.trabajadores.estado');
+    Route::delete('/personal/secciones/{servicio}/trabajadores/{trabajador}', [ControladorAdminDashboard::class, 'eliminarTrabajadorDeServicio'])
+    ->name('personal.trabajadores.eliminar-servicio');
     Route::delete('/personal/trabajadores/{trabajador}', [ControladorAdminDashboard::class, 'eliminarTrabajador'])->name('personal.trabajadores.eliminar');
 
     Route::patch('/citas/{cita}/asistencia', [ControladorAdminDashboard::class, 'actualizarAsistencia'])->name('citas.asistencia');

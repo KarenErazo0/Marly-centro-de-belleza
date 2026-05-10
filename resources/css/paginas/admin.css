@@ -2347,3 +2347,24 @@ html[data-theme="dark"] .admin-sidebar-actions .theme-toggle {
     font-size: 13px;
     font-weight: 400;
 }
+.admin-worker-section,
+.worker-grid,
+.worker-card {
+    overflow: visible !important;
+}
+
+.worker-card-menu {
+    z-index: 100 !important;
+}
+
+.worker-menu-dropdown {
+    width: 230px !important;
+    z-index: 999 !important;
+}
+
+.worker-menu-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+    white-space: nowrap !important;
+}

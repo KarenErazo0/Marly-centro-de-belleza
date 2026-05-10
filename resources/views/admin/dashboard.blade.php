@@ -202,47 +202,44 @@
                                             ⋮
                                         </button>
 
-                                        <div class="worker-menu-dropdown">
-                                            <button type="button" class="worker-menu-item"
-                                                data-open-modal="modal-editar-trabajador-{{ $trabajador->id_trabajador }}">
-                                                <span>✎</span>
-                                                <span>Editar</span>
-                                            </button>
+                                       <div class="worker-menu-dropdown">
+    <button type="button" class="worker-menu-item"
+        data-open-modal="modal-editar-trabajador-{{ $servicio->id_servicio }}-{{ $trabajador->id_trabajador }}">
+        <span>✎</span>
+        <span>Editar</span>
+    </button>
 
-                                            <form
-                                                action="{{ route('admin.personal.trabajadores.estado', $trabajador) }}"
-                                                method="POST">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="worker-menu-item"
-                                                    data-confirm-title="Cambiar estado"
-                                                    data-confirm-message="¿Quieres {{ $trabajador->estado === 'activo' ? 'desactivar' : 'activar' }} a {{ $trabajador->nombre_completo }}?"
-                                                    data-confirm-detail="{{ $trabajador->estado === 'activo' ? 'No aparecerá disponible para nuevas reservas.' : 'Volverá a aparecer disponible para nuevas reservas.' }}"
-                                                    data-confirm-action="Guardar estado">
-                                                    <span>{{ $trabajador->estado === 'activo' ? 'Ⅱ' : '▶' }}</span>
-                                                    <span>{{ $trabajador->estado === 'activo' ? 'Desactivar' : 'Activar' }}</span>
-                                                </button>
-                                            </form>
+    <button type="button" class="worker-menu-item"
+        data-open-modal="modal-duplicar-trabajador-{{ $trabajador->id_trabajador }}">
+        <span>⧉</span>
+        <span>Duplicar en otra sección</span>
+    </button>
 
-                                            <form
-                                                action="{{ route('admin.personal.trabajadores.eliminar', $trabajador) }}"
-                                                method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="worker-menu-item danger"
-                                                    data-confirm-title="Eliminar trabajador"
-                                                    data-confirm-message="¿Eliminar a {{ $trabajador->nombre_completo }}?"
-                                                    data-confirm-detail="Si el trabajador tiene citas registradas, el sistema no permitirá eliminarlo para proteger el historial."
-                                                    data-confirm-action="Eliminar">
-                                                    <span class="trash-icon" aria-hidden="true"><svg
-                                                            viewBox="0 0 24 24">
-                                                            <path
-                                                                d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" />
-                                                        </svg></span>
-                                                    <span>Eliminar</span>
-                                                </button>
-                                            </form>
-                                        </div>
+    <form action="{{ route('admin.personal.trabajadores.estado', $trabajador) }}" method="POST">
+        @csrf
+        @method('PATCH')
+        <button type="submit" class="worker-menu-item"
+            data-confirm-title="Cambiar estado"
+            data-confirm-message="¿Quieres {{ $trabajador->estado === 'activo' ? 'desactivar' : 'activar' }} a {{ $trabajador->nombre_completo }}?"
+            data-confirm-detail="{{ $trabajador->estado === 'activo' ? 'No aparecerá disponible para nuevas reservas.' : 'Volverá a aparecer disponible para nuevas reservas.' }}"
+            data-confirm-action="Guardar estado">
+            <span>{{ $trabajador->estado === 'activo' ? 'Ⅱ' : '▶' }}</span>
+            <span>{{ $trabajador->estado === 'activo' ? 'Desactivar' : 'Activar' }}</span>
+        </button>
+    </form>
+
+    <form action="{{ route('admin.personal.trabajadores.eliminar-servicio', [$servicio, $trabajador]) }}" method="POST">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="worker-menu-item danger"
+            data-confirm-title="Quitar trabajador de esta sección"
+            data-confirm-message="¿Quitar a {{ $trabajador->nombre_completo }} de {{ $servicio->nombre_servicio }}?"
+            data-confirm-detail="Si el trabajador pertenece a otras secciones, solo se quitará de esta. Si no queda en ninguna sección y no tiene citas, se eliminará completamente."
+            data-confirm-action="Quitar">
+            🗑 Eliminar
+        </button>
+    </form>
+</div>
                                     </div>
                                 </article>
                             @endforeach
@@ -638,29 +635,90 @@
         </div>
     @endforeach
 
+    @foreach ($servicios as $servicioModal)
+        @foreach ($servicioModal->trabajadores as $trabajador)
+            <div class="admin-modal"
+                id="modal-editar-trabajador-{{ $servicioModal->id_servicio }}-{{ $trabajador->id_trabajador }}"
+                aria-hidden="true">
+                <div class="admin-modal-backdrop" data-close-modal></div>
+                <form class="admin-modal-card"
+                    action="{{ route('admin.personal.trabajadores.actualizar', [$servicioModal, $trabajador]) }}"
+                    method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <button type="button" class="modal-close" data-close-modal>×</button>
+                    <h2>Editar trabajador</h2>
+
+                    <label>
+                        Sección
+                        <select name="id_servicio" required>
+                            @foreach ($servicios as $servicioDestino)
+                                <option value="{{ $servicioDestino->id_servicio }}"
+                                    {{ $servicioDestino->id_servicio == $servicioModal->id_servicio ? 'selected' : '' }}>
+                                    {{ $servicioDestino->nombre_servicio }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </label>
+
+                    <label>
+                        Nombre
+                        <input type="text" name="nombre_completo" value="{{ $trabajador->nombre_completo }}" required>
+                    </label>
+
+                    <label>
+                        Foto
+                        <input type="file" name="foto" accept="image/*">
+                    </label>
+
+                    <button type="submit" class="admin-btn admin-btn-gold"
+                        data-confirm-title="Guardar trabajador"
+                        data-confirm-message="¿Guardar cambios de {{ $trabajador->nombre_completo }}?"
+                        data-confirm-detail="Solo se moverá esta sección. Las otras secciones donde esté el trabajador no se perderán."
+                        data-confirm-action="Guardar cambios">
+                        Guardar cambios
+                    </button>
+                </form>
+            </div>
+        @endforeach
+    @endforeach
     @foreach ($trabajadores as $trabajador)
-        <div class="admin-modal" id="modal-editar-trabajador-{{ $trabajador->id_trabajador }}" aria-hidden="true">
+        <div class="admin-modal" id="modal-duplicar-trabajador-{{ $trabajador->id_trabajador }}"
+            aria-hidden="true">
             <div class="admin-modal-backdrop" data-close-modal></div>
-            <form class="admin-modal-card"
-                action="{{ route('admin.personal.trabajadores.actualizar', $trabajador) }}" method="POST"
-                enctype="multipart/form-data">
-                @csrf @method('PUT')
+
+            <form class="admin-modal-card small"
+                action="{{ route('admin.personal.trabajadores.duplicar', $trabajador) }}" method="POST">
+                @csrf
+
                 <button type="button" class="modal-close" data-close-modal>×</button>
-                <h2>Editar trabajador</h2>
-                <label>Sección<select name="id_servicio" required>
+
+                <h2>Duplicar trabajador</h2>
+
+                <p>
+                    Selecciona la sección donde también aparecerá
+                    <strong>{{ $trabajador->nombre_completo }}</strong>.
+                </p>
+
+                <label>
+                    Nueva sección
+                    <select name="id_servicio" required>
                         @foreach ($servicios as $servicio)
-                            <option value="{{ $servicio->id_servicio }}"
-                                {{ $trabajador->servicios->contains('id_servicio', $servicio->id_servicio) ? 'selected' : '' }}>
-                                {{ $servicio->nombre_servicio }}</option>
+                            @if (!$trabajador->servicios->contains('id_servicio', $servicio->id_servicio))
+                                <option value="{{ $servicio->id_servicio }}">
+                                    {{ $servicio->nombre_servicio }}
+                                </option>
+                            @endif
                         @endforeach
-                    </select></label>
-                <label>Nombre<input type="text" name="nombre_completo"
-                        value="{{ $trabajador->nombre_completo }}" required></label>
-                <label>Foto<input type="file" name="foto" accept="image/*"></label>
-                <button type="submit" class="admin-btn admin-btn-gold" data-confirm-title="Guardar trabajador"
-                    data-confirm-message="¿Guardar los cambios de {{ $trabajador->nombre_completo }}?"
-                    data-confirm-detail="Se actualizará el nombre, foto o sección del trabajador."
-                    data-confirm-action="Guardar cambios">Guardar cambios</button>
+                    </select>
+                </label>
+
+                <button type="submit" class="admin-btn admin-btn-gold" data-confirm-title="Duplicar trabajador"
+                    data-confirm-message="¿Duplicar a {{ $trabajador->nombre_completo }} en otra sección?"
+                    data-confirm-detail="No se creará otro trabajador en la base de datos. Solo se agregará una nueva relación con la sección seleccionada."
+                    data-confirm-action="Duplicar">
+                    Duplicar trabajador
+                </button>
             </form>
         </div>
     @endforeach

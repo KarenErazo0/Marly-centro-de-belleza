@@ -193,24 +193,50 @@ public function eliminarServicio(Servicio $servicio): RedirectResponse
     if ($tieneCitas) {
         return redirect()
             ->route('admin.dashboard', ['tab' => 'servicios'])
-            ->with('error', 'No se puede eliminar este servicio porque tiene citas registradas. Desactiva el servicio para que no aparezca al cliente y asegurate que no está siendo utilizado en ninguna reserva.');
+            ->with('error', 'No se puede eliminar este servicio porque tiene citas registradas. Desactívalo para ocultarlo y conservar el historial.');
     }
 
     try {
-        $imagen = $servicio->imagen;
+        DB::transaction(function () use ($servicio) {
+            $imagen = $servicio->imagen;
 
-        $servicio->trabajadores()->detach();
-        $servicio->delete();
+            $trabajadores = $servicio->trabajadores()->get();
 
-        $this->eliminarImagenPublica($imagen, 'images/services/');
+            foreach ($trabajadores as $trabajador) {
+                $trabajador->servicios()->detach($servicio->id_servicio);
+
+                $trabajador->load('servicios');
+
+                if ($trabajador->servicios->count() === 0) {
+                    $tieneCitas = $trabajador->citas()->exists() || $trabajador->detalles()->exists();
+
+                    if ($tieneCitas) {
+                        $trabajador->update([
+                            'estado' => 'inactivo',
+                            'especialidad' => 'Sin sección asignada',
+                        ]);
+                    } else {
+                        $foto = $trabajador->foto;
+                        $trabajador->delete();
+                        $this->eliminarImagenPublica($foto, 'images/services/');
+                    }
+                } else {
+                    $this->actualizarEspecialidadTrabajador($trabajador);
+                }
+            }
+
+            $servicio->delete();
+
+            $this->eliminarImagenPublica($imagen, 'images/services/');
+        });
 
         return redirect()
             ->route('admin.dashboard', ['tab' => 'servicios'])
-            ->with('success', 'Servicio eliminado correctamente.');
+            ->with('success', 'Servicio eliminado correctamente. También se eliminaron sus relaciones con trabajadores.');
     } catch (QueryException $exception) {
         return redirect()
             ->route('admin.dashboard', ['tab' => 'servicios'])
-            ->with('error', 'No se pudo eliminar el servicio porque está relacionado con otros registros. Puedes desactivarlo para ocultarlo al cliente.');
+            ->with('error', 'No se pudo eliminar el servicio porque tiene registros asociados.');
     }
 }
 
@@ -283,34 +309,171 @@ public function eliminarServicio(Servicio $servicio): RedirectResponse
             ->with('success', 'Trabajador agregado correctamente.');
     }
 
- public function actualizarTrabajador(Request $request, Trabajador $trabajador): RedirectResponse
+public function actualizarTrabajador(Request $request, Servicio $servicio, Trabajador $trabajador): RedirectResponse
 {
-    $validated = $request->validate($this->reglasTrabajador(false), [], $this->atributosTrabajador());
+    $validated = $request->validate([
+        'id_servicio' => ['required', 'exists:servicios,id_servicio'],
+        'nombre_completo' => ['required', 'string', 'max:255'],
+        'foto' => ['nullable', 'image', 'max:4096'],
+    ], [], [
+        'id_servicio' => 'sección',
+        'nombre_completo' => 'nombre',
+        'foto' => 'foto',
+    ]);
 
-    $servicio = Servicio::findOrFail($validated['id_servicio']);
+    $fotoAnterior = $trabajador->foto;
 
-    $data = [
+    $datos = [
         'nombre_completo' => $validated['nombre_completo'],
-        'especialidad' => $servicio->nombre_servicio,
     ];
 
     if ($request->hasFile('foto')) {
-        $fotoAnterior = $trabajador->foto;
-
-        $data['foto'] = $this->guardarImagen($request, 'foto', 'services', 'admin-worker');
-
-        $trabajador->update($data);
-
-        $this->eliminarImagenPublica($fotoAnterior, 'images/services/');
-    } else {
-        $trabajador->update($data);
+        $datos['foto'] = $this->guardarImagen($request, 'foto', 'services', 'admin-worker');
     }
 
-    $trabajador->servicios()->sync([$servicio->id_servicio]);
+    try {
+        DB::transaction(function () use ($trabajador, $servicio, $validated, $datos) {
+            $trabajador->update($datos);
+
+            /*
+             * Importante:
+             * este método edita la tarjeta desde una sección específica.
+             * Por eso solo mueve la relación de esa sección y conserva las demás.
+             */
+            $this->limpiarRelacionesDuplicadasTrabajador($trabajador);
+
+            $servicioActualId = (int) $servicio->id_servicio;
+            $nuevoServicioId = (int) $validated['id_servicio'];
+
+            if ($nuevoServicioId !== $servicioActualId) {
+                $trabajador->servicios()->detach($servicioActualId);
+
+                $yaExisteEnNuevoServicio = $trabajador->servicios()
+                    ->where('servicios.id_servicio', $nuevoServicioId)
+                    ->exists();
+
+                if (! $yaExisteEnNuevoServicio) {
+                    $trabajador->servicios()->attach($nuevoServicioId);
+                }
+            }
+
+            $this->limpiarRelacionesDuplicadasTrabajador($trabajador);
+            $this->actualizarEspecialidadTrabajador($trabajador);
+        });
+    } catch (QueryException $exception) {
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('error', 'No se pudo actualizar el trabajador. Revisa que la sección seleccionada sea válida.');
+    }
+
+    if ($request->hasFile('foto') && $fotoAnterior && $fotoAnterior !== $trabajador->foto) {
+        $this->eliminarImagenPublica($fotoAnterior, 'images/services/');
+    }
 
     return redirect()
         ->route('admin.dashboard', ['tab' => 'personal'])
         ->with('success', 'Trabajador actualizado correctamente.');
+}
+
+public function duplicarTrabajadorEnServicio(Request $request, Trabajador $trabajador): RedirectResponse
+{
+    $validated = $request->validate([
+        'id_servicio' => ['required', 'exists:servicios,id_servicio'],
+    ], [], [
+        'id_servicio' => 'servicio o sección',
+    ]);
+
+    $servicio = Servicio::findOrFail($validated['id_servicio']);
+
+    $this->limpiarRelacionesDuplicadasTrabajador($trabajador);
+
+    if ($trabajador->servicios()->where('servicios.id_servicio', $servicio->id_servicio)->exists()) {
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('error', 'Este trabajador ya pertenece a esa sección.');
+    }
+
+    $trabajador->servicios()->syncWithoutDetaching([$servicio->id_servicio]);
+
+    $this->limpiarRelacionesDuplicadasTrabajador($trabajador);
+    $this->actualizarEspecialidadTrabajador($trabajador);
+
+    return redirect()
+        ->route('admin.dashboard', ['tab' => 'personal'])
+        ->with('success', 'Trabajador duplicado correctamente en la sección seleccionada.');
+}
+public function eliminarTrabajadorDeServicio(Servicio $servicio, Trabajador $trabajador): RedirectResponse
+{
+    if (! $trabajador->servicios()->where('servicios.id_servicio', $servicio->id_servicio)->exists()) {
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('error', 'Este trabajador no pertenece a la sección seleccionada.');
+    }
+
+    try {
+        DB::transaction(function () use ($servicio, $trabajador) {
+            $trabajador->servicios()->detach($servicio->id_servicio);
+
+            $trabajador->load('servicios');
+
+            if ($trabajador->servicios->count() === 0) {
+                $tieneCitas = $trabajador->citas()->exists() || $trabajador->detalles()->exists();
+
+                if ($tieneCitas) {
+                    $trabajador->update([
+                        'estado' => 'inactivo',
+                        'especialidad' => 'Sin sección asignada',
+                    ]);
+
+                    return;
+                }
+
+                $foto = $trabajador->foto;
+
+                $trabajador->delete();
+
+                $this->eliminarImagenPublica($foto, 'images/services/');
+
+                return;
+            }
+
+            $this->actualizarEspecialidadTrabajador($trabajador);
+        });
+
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('success', 'Trabajador eliminado de esta sección correctamente.');
+    } catch (QueryException $exception) {
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('error', 'No se pudo quitar el trabajador de esta sección.');
+    }
+}
+private function limpiarRelacionesDuplicadasTrabajador(Trabajador $trabajador): void
+{
+    $servicioIds = $trabajador->servicios()
+        ->pluck('servicios.id_servicio')
+        ->map(fn ($id) => (int) $id)
+        ->unique()
+        ->values()
+        ->all();
+
+    $trabajador->servicios()->sync($servicioIds);
+    $trabajador->load('servicios');
+}
+
+private function actualizarEspecialidadTrabajador(Trabajador $trabajador): void
+{
+    $trabajador->load('servicios');
+
+    $especialidad = $trabajador->servicios
+        ->pluck('nombre_servicio')
+        ->filter()
+        ->implode(', ');
+
+    $trabajador->update([
+        'especialidad' => $especialidad ?: 'Sin sección asignada',
+    ]);
 }
 
 public function eliminarTrabajador(Trabajador $trabajador): RedirectResponse
