@@ -331,8 +331,7 @@
                 @endforelse
             </section>
 
-            <div class="admin-pagination-note">Mostrando 1 a {{ $servicios->count() }} de {{ $servicios->count() }}
-                servicios <span>‹</span><b>1</b><span>›</span></div>
+        
 
         @endif
 
