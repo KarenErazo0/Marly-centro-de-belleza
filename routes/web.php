@@ -25,6 +25,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin.sesion')->group(functi
 
     Route::post('/personal/trabajadores', [ControladorAdminDashboard::class, 'guardarTrabajador'])->name('personal.trabajadores.guardar');
     Route::put('/personal/trabajadores/{trabajador}', [ControladorAdminDashboard::class, 'actualizarTrabajador'])->name('personal.trabajadores.actualizar');
+    Route::patch('/personal/trabajadores/{trabajador}/estado', [ControladorAdminDashboard::class, 'cambiarEstadoTrabajador'])->name('personal.trabajadores.estado');
     Route::delete('/personal/trabajadores/{trabajador}', [ControladorAdminDashboard::class, 'eliminarTrabajador'])->name('personal.trabajadores.eliminar');
 
     Route::patch('/citas/{cita}/asistencia', [ControladorAdminDashboard::class, 'actualizarAsistencia'])->name('citas.asistencia');

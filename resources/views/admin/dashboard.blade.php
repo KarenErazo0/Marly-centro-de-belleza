@@ -190,24 +190,59 @@
                                         alt="{{ $trabajador->nombre_completo }}"
                                         onerror="this.onerror=null;this.src='{{ asset('images/services/default-service.jpg') }}';">
                                     <h3>{{ $trabajador->nombre_completo }}</h3>
-                                    <div class="worker-card-actions">
-                                        <button type="button" class="admin-mini-btn compact"
-                                            data-open-modal="modal-editar-trabajador-{{ $trabajador->id_trabajador }}">✎
-                                            Editar</button>
-                                        <form
-                                            action="{{ route('admin.personal.trabajadores.eliminar', $trabajador) }}"
-                                            method="POST" class="inline-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="admin-mini-btn compact danger"
-                                                data-confirm-title="Eliminar trabajador"
-                                                data-confirm-message="¿Eliminar a {{ $trabajador->nombre_completo }}?"
-                                                data-confirm-detail="Su foto y datos se eliminarán del módulo de personal si no existen citas asociadas."
-                                                data-confirm-action="Eliminar"><span class="trash-icon"
-                                                    aria-hidden="true"><svg viewBox="0 0 24 24">
-                                                        <path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" />
-                                                    </svg></span><span>Eliminar</span></button>
-                                        </form>
+
+                                    <span
+                                        class="worker-status {{ $trabajador->estado === 'activo' ? 'active' : 'inactive' }}">
+                                        {{ $trabajador->estado === 'activo' ? 'Activo' : 'Inactivo' }}
+                                    </span>
+
+                                    <div class="worker-card-menu">
+                                        <button type="button" class="worker-menu-toggle"
+                                            aria-label="Opciones de {{ $trabajador->nombre_completo }}">
+                                            ⋮
+                                        </button>
+
+                                        <div class="worker-menu-dropdown">
+                                            <button type="button" class="worker-menu-item"
+                                                data-open-modal="modal-editar-trabajador-{{ $trabajador->id_trabajador }}">
+                                                <span>✎</span>
+                                                <span>Editar</span>
+                                            </button>
+
+                                            <form
+                                                action="{{ route('admin.personal.trabajadores.estado', $trabajador) }}"
+                                                method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="worker-menu-item"
+                                                    data-confirm-title="Cambiar estado"
+                                                    data-confirm-message="¿Quieres {{ $trabajador->estado === 'activo' ? 'desactivar' : 'activar' }} a {{ $trabajador->nombre_completo }}?"
+                                                    data-confirm-detail="{{ $trabajador->estado === 'activo' ? 'No aparecerá disponible para nuevas reservas.' : 'Volverá a aparecer disponible para nuevas reservas.' }}"
+                                                    data-confirm-action="Guardar estado">
+                                                    <span>{{ $trabajador->estado === 'activo' ? 'Ⅱ' : '▶' }}</span>
+                                                    <span>{{ $trabajador->estado === 'activo' ? 'Desactivar' : 'Activar' }}</span>
+                                                </button>
+                                            </form>
+
+                                            <form
+                                                action="{{ route('admin.personal.trabajadores.eliminar', $trabajador) }}"
+                                                method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="worker-menu-item danger"
+                                                    data-confirm-title="Eliminar trabajador"
+                                                    data-confirm-message="¿Eliminar a {{ $trabajador->nombre_completo }}?"
+                                                    data-confirm-detail="Si el trabajador tiene citas registradas, el sistema no permitirá eliminarlo para proteger el historial."
+                                                    data-confirm-action="Eliminar">
+                                                    <span class="trash-icon" aria-hidden="true"><svg
+                                                            viewBox="0 0 24 24">
+                                                            <path
+                                                                d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" />
+                                                        </svg></span>
+                                                    <span>Eliminar</span>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </article>
                             @endforeach
@@ -538,7 +573,14 @@
             <label>Nombre del servicio<input type="text" name="nombre_servicio" required></label>
             <label>Precio estimado<input type="number" name="precio" min="0" step="100"
                     required></label>
-            <label>Duración estimada<input type="number" name="duracion_minutos" min="1" required></label>
+            <label>
+                <span class="label-linea">
+                    Duración estimada
+                    <span class="texto-ayuda">(en minutos)</span>
+                </span>
+
+                <input type="number" name="duracion_minutos" min="20" required>
+            </label>
             <label>Foto<input type="file" name="imagen" accept="image/*" required></label>
             <label class="full">Descripción
                 <textarea name="descripcion" rows="4" required></textarea>
@@ -612,8 +654,8 @@
                                 {{ $servicio->nombre_servicio }}</option>
                         @endforeach
                     </select></label>
-                <label>Nombre<input type="text" name="nombre_completo" value="{{ $trabajador->nombre_completo }}"
-                        required></label>
+                <label>Nombre<input type="text" name="nombre_completo"
+                        value="{{ $trabajador->nombre_completo }}" required></label>
                 <label>Foto<input type="file" name="foto" accept="image/*"></label>
                 <button type="submit" class="admin-btn admin-btn-gold" data-confirm-title="Guardar trabajador"
                     data-confirm-message="¿Guardar los cambios de {{ $trabajador->nombre_completo }}?"

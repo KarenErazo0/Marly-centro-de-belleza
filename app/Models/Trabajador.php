@@ -33,4 +33,9 @@ class Trabajador extends Model
     {
         return $this->hasMany(Cita::class, 'id_trabajador', 'id_trabajador');
     }
+
+    public function detalles(): HasMany
+    {
+        return $this->hasMany(CitaDetalle::class, 'id_trabajador', 'id_trabajador');
+    }
 }

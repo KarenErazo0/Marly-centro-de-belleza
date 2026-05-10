@@ -48,10 +48,12 @@ class ControladorAdminDashboard extends Controller
             ->get();
 
         $servicios = Servicio::with(['trabajadores' => fn ($q) => $q->orderBy('nombre_completo')])
+            ->withCount(['citas', 'detalles'])
             ->orderBy('nombre_servicio')
             ->get();
 
         $trabajadores = Trabajador::with('servicios')
+            ->withCount(['citas', 'detalles'])
             ->orderBy('nombre_completo')
             ->get();
 
@@ -169,20 +171,46 @@ public function actualizarServicio(Request $request, Servicio $servicio): Redire
             ->with('success', $mensaje);
     }
 
+    public function cambiarEstadoTrabajador(Trabajador $trabajador): RedirectResponse
+{
+    $trabajador->update([
+        'estado' => $trabajador->estado === 'activo' ? 'inactivo' : 'activo',
+    ]);
+
+    $mensaje = $trabajador->estado === 'activo'
+        ? 'Trabajador activado y disponible para nuevas citas.'
+        : 'Trabajador desactivado. Ya no aparecerá disponible para nuevas reservas.';
+
+    return redirect()
+        ->route('admin.dashboard', ['tab' => 'personal'])
+        ->with('success', $mensaje);
+}
+
 public function eliminarServicio(Servicio $servicio): RedirectResponse
 {
+    $tieneCitas = $servicio->citas()->exists() || $servicio->detalles()->exists();
+
+    if ($tieneCitas) {
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'servicios'])
+            ->with('error', 'No se puede eliminar este servicio porque tiene citas registradas. Desactiva el servicio para que no aparezca al cliente y asegurate que no está siendo utilizado en ninguna reserva.');
+    }
+
     try {
         $imagen = $servicio->imagen;
 
+        $servicio->trabajadores()->detach();
         $servicio->delete();
 
         $this->eliminarImagenPublica($imagen, 'images/services/');
 
         return redirect()
             ->route('admin.dashboard', ['tab' => 'servicios'])
-            ->with('success', 'Servicio eliminado completamente del catálogo.');
+            ->with('success', 'Servicio eliminado correctamente.');
     } catch (QueryException $exception) {
-        return back()->with('error', 'No se pudo eliminar el servicio porque está relacionado con registros existentes. Puedes dejarlo inactivo para ocultarlo al cliente.');
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'servicios'])
+            ->with('error', 'No se pudo eliminar el servicio porque está relacionado con otros registros. Puedes desactivarlo para ocultarlo al cliente.');
     }
 }
 
@@ -287,9 +315,18 @@ public function eliminarServicio(Servicio $servicio): RedirectResponse
 
 public function eliminarTrabajador(Trabajador $trabajador): RedirectResponse
 {
+    $tieneCitas = $trabajador->citas()->exists() || $trabajador->detalles()->exists();
+
+    if ($tieneCitas) {
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('error', 'No se puede eliminar este trabajador porque tiene citas registradas. Desactívalo para que no aparezca en nuevas reservas y asegurate que no está siendo utilizado en ninguna reserva.');
+    }
+
     try {
         $foto = $trabajador->foto;
 
+        $trabajador->servicios()->detach();
         $trabajador->delete();
 
         $this->eliminarImagenPublica($foto, 'images/services/');
@@ -298,27 +335,38 @@ public function eliminarTrabajador(Trabajador $trabajador): RedirectResponse
             ->route('admin.dashboard', ['tab' => 'personal'])
             ->with('success', 'Trabajador eliminado correctamente.');
     } catch (QueryException $exception) {
-        return back()->with('error', 'No se pudo eliminar el trabajador porque tiene citas asociadas. Puedes conservarlo para mantener el historial de citas.');
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('error', 'No se pudo eliminar el trabajador porque está relacionado con otros registros. Puedes desactivarlo para ocultarlo de nuevas reservas.');
     }
 }
-    public function eliminarSeccionPersonal(Servicio $servicio): RedirectResponse
-    {
-        try {
-            $servicio->trabajadores()->detach();
+public function eliminarSeccionPersonal(Servicio $servicio): RedirectResponse
+{
+    $tieneCitas = $servicio->citas()->exists() || $servicio->detalles()->exists();
 
-            $imagen = $servicio->imagen;
-            $servicio->delete();
-
-            $this->eliminarImagenPublica($imagen, 'images/services/');
-
-            return redirect()
-                ->route('admin.dashboard', ['tab' => 'personal'])
-                ->with('success', 'Sección eliminada correctamente.');
-        } catch (QueryException $exception) {
-            return back()->with('error', 'No se pudo eliminar la sección porque tiene registros asociados.');
-        }
+    if ($tieneCitas) {
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('error', 'No se puede eliminar esta sección porque tiene servicios o citas registradas. Puedes desactivarla desde Gestión de servicios.');
     }
 
+    try {
+        $servicio->trabajadores()->detach();
+
+        $imagen = $servicio->imagen;
+        $servicio->delete();
+
+        $this->eliminarImagenPublica($imagen, 'images/services/');
+
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('success', 'Sección eliminada correctamente.');
+    } catch (QueryException $exception) {
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('error', 'No se pudo eliminar la sección porque tiene registros asociados.');
+    }
+}
     public function actualizarAsistencia(Request $request, Cita $cita): RedirectResponse
     {
         $validated = $request->validate([

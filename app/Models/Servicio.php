@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Servicio extends Model
 {
@@ -25,7 +26,6 @@ class Servicio extends Model
 
     public $timestamps = false;
 
-
     public function trabajadores(): BelongsToMany
     {
         return $this->belongsToMany(Trabajador::class, 'trabajador_servicio', 'id_servicio', 'id_trabajador');
@@ -35,5 +35,9 @@ class Servicio extends Model
     {
         return $this->belongsToMany(Cita::class, 'cita_servicio', 'id_servicio', 'id_cita');
     }
-}
 
+    public function detalles(): HasMany
+    {
+        return $this->hasMany(CitaDetalle::class, 'id_servicio', 'id_servicio');
+    }
+}
