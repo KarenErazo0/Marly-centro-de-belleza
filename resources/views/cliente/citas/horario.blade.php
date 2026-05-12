@@ -33,7 +33,7 @@
                                 id="fecha_selector"
                                 name="fecha"
                                 value="{{ $fechaSeleccionada }}"
-                                min="{{ now()->format('Y-m-d') }}"
+                               min="{{ now('America/Bogota')->format('Y-m-d') }}"
                                 data-url-base="{{ route('cliente.citas.agendar.horario') }}"
                                 required
                             >

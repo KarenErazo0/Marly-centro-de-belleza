@@ -25,8 +25,10 @@ class ControladorAdminDashboard extends Controller
     {
         Carbon::setLocale('es');
 
-        $hoy = Carbon::today();
-        $fechaSeleccionada = $request->query('fecha') ? Carbon::parse($request->query('fecha')) : $hoy->copy();
+        $hoy = Carbon::today('America/Bogota');
+$fechaSeleccionada = $request->query('fecha')
+    ? Carbon::parse($request->query('fecha'), 'America/Bogota')
+    : $hoy->copy();
         $mesActual = $request->query('mes') ? Carbon::createFromFormat('Y-m', $request->query('mes'))->startOfMonth() : $fechaSeleccionada->copy()->startOfMonth();
 
         $inicioMes = $mesActual->copy()->startOfMonth();
@@ -862,8 +864,7 @@ private function eliminarImagenPublica(?string $archivo, string $carpetaRelativa
             $inicioMesAnterior,
             $finMesAnterior
         ) {
-            $fecha = Carbon::parse($cita->fecha_cita);
-
+            $fecha = Carbon::parse($cita->fecha_cita, 'America/Bogota');
             if ($fecha->isToday()) {
                 return 'Citas de hoy';
             }

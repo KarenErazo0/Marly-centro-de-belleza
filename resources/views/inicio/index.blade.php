@@ -164,7 +164,7 @@
             <div class="layout-sobre-nosotros marly-sobre-layout">
                 <div class="carrusel-sobre marly-sobre-carrusel" aria-label="Carrusel de fotos de Marly Centro de Belleza">
                     <div class="carrusel-ventana" id="carrusel-sobre-ventana">
-                        @foreach (['1.png', '2.png', '3.png', '4.png', '5.png', '6.png'] as $foto)
+                        @foreach (['manicure.jpg', 'pedicure.jpg', 'peinado.jpg', 'tinte.jpg', 'maquillaje.jpg', 'depilacion.jpg'] as $foto)
                             <div class="slide-sobre">
                                 <img src="{{ asset('images/services/' . $foto) }}" alt="Foto de Marly Centro de Belleza">
                             </div>
