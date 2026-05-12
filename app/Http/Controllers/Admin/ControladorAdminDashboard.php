@@ -172,30 +172,12 @@ public function actualizarServicio(Request $request, Servicio $servicio): Redire
             ->route('admin.dashboard', ['tab' => 'servicios'])
             ->with('success', $mensaje);
     }
-
-    public function cambiarEstadoTrabajador(Trabajador $trabajador): RedirectResponse
-{
-    $trabajador->update([
-        'estado' => $trabajador->estado === 'activo' ? 'inactivo' : 'activo',
-    ]);
-
-    $mensaje = $trabajador->estado === 'activo'
-        ? 'Trabajador activado y disponible para nuevas citas.'
-        : 'Trabajador desactivado. Ya no aparecerá disponible para nuevas reservas.';
-
-    return redirect()
-        ->route('admin.dashboard', ['tab' => 'personal'])
-        ->with('success', $mensaje);
-}
-
 public function eliminarServicio(Servicio $servicio): RedirectResponse
 {
-    $tieneCitas = $servicio->citas()->exists() || $servicio->detalles()->exists();
-
-    if ($tieneCitas) {
+    if ($this->servicioTieneCitasPendientes($servicio)) {
         return redirect()
             ->route('admin.dashboard', ['tab' => 'servicios'])
-            ->with('error', 'No se puede eliminar este servicio porque tiene citas registradas. Desactívalo para ocultarlo y conservar el historial.');
+            ->with('error', 'No se puede eliminar este servicio porque tiene citas pendientes o futuras registradas. Puedes desactivarlo mientras se atienden esas citas.');
     }
 
     try {
@@ -210,22 +192,24 @@ public function eliminarServicio(Servicio $servicio): RedirectResponse
                 $trabajador->load('servicios');
 
                 if ($trabajador->servicios->count() === 0) {
-                    $tieneCitas = $trabajador->citas()->exists() || $trabajador->detalles()->exists();
-
-                    if ($tieneCitas) {
+                    if ($this->trabajadorTieneCitasPendientes($trabajador)) {
                         $trabajador->update([
                             'estado' => 'inactivo',
                             'especialidad' => 'Sin sección asignada',
                         ]);
-                    } else {
-                        $foto = $trabajador->foto;
-                        $trabajador->delete();
-                        $this->eliminarImagenPublica($foto, 'images/services/');
+
+                        continue;
                     }
+
+                    $foto = $trabajador->foto;
+                    $trabajador->delete();
+                    $this->eliminarImagenPublica($foto, 'images/services/');
                 } else {
                     $this->actualizarEspecialidadTrabajador($trabajador);
                 }
             }
+
+            $this->eliminarRelacionesHistoricasServicio($servicio);
 
             $servicio->delete();
 
@@ -234,12 +218,26 @@ public function eliminarServicio(Servicio $servicio): RedirectResponse
 
         return redirect()
             ->route('admin.dashboard', ['tab' => 'servicios'])
-            ->with('success', 'Servicio eliminado correctamente. También se eliminaron sus relaciones con trabajadores.');
+            ->with('success', 'Servicio eliminado correctamente. No existían citas pendientes asociadas.');
     } catch (QueryException $exception) {
         return redirect()
             ->route('admin.dashboard', ['tab' => 'servicios'])
-            ->with('error', 'No se pudo eliminar el servicio porque tiene registros asociados.');
+            ->with('error', 'No se pudo eliminar el servicio porque todavía tiene registros protegidos.');
     }
+}
+    public function cambiarEstadoTrabajador(Trabajador $trabajador): RedirectResponse
+{
+    $trabajador->update([
+        'estado' => $trabajador->estado === 'activo' ? 'inactivo' : 'activo',
+    ]);
+
+    $mensaje = $trabajador->estado === 'activo'
+        ? 'Trabajador activado y disponible para nuevas citas.'
+        : 'Trabajador desactivado. Ya no aparecerá disponible para nuevas reservas.';
+
+    return redirect()
+        ->route('admin.dashboard', ['tab' => 'personal'])
+        ->with('success', $mensaje);
 }
 
     public function crearSeccionPersonal(Request $request): RedirectResponse
@@ -412,24 +410,20 @@ public function eliminarTrabajadorDeServicio(Servicio $servicio, Trabajador $tra
             ->with('error', 'Este trabajador no pertenece a la sección seleccionada.');
     }
 
+    $totalServicios = $trabajador->servicios()->count();
+    $esUltimaSeccion = $totalServicios <= 1;
+
+    if ($esUltimaSeccion && $this->trabajadorTieneCitasPendientes($trabajador)) {
+        return redirect()
+            ->route('admin.dashboard', ['tab' => 'personal'])
+            ->with('error', 'No se puede quitar este trabajador porque es su última sección y tiene citas pendientes o futuras registradas.');
+    }
+
     try {
-        DB::transaction(function () use ($servicio, $trabajador) {
+        DB::transaction(function () use ($servicio, $trabajador, $esUltimaSeccion) {
             $trabajador->servicios()->detach($servicio->id_servicio);
 
-            $trabajador->load('servicios');
-
-            if ($trabajador->servicios->count() === 0) {
-                $tieneCitas = $trabajador->citas()->exists() || $trabajador->detalles()->exists();
-
-                if ($tieneCitas) {
-                    $trabajador->update([
-                        'estado' => 'inactivo',
-                        'especialidad' => 'Sin sección asignada',
-                    ]);
-
-                    return;
-                }
-
+            if ($esUltimaSeccion) {
                 $foto = $trabajador->foto;
 
                 $trabajador->delete();
@@ -444,7 +438,7 @@ public function eliminarTrabajadorDeServicio(Servicio $servicio, Trabajador $tra
 
         return redirect()
             ->route('admin.dashboard', ['tab' => 'personal'])
-            ->with('success', 'Trabajador eliminado de esta sección correctamente.');
+            ->with('success', 'Trabajador quitado de esta sección correctamente.');
     } catch (QueryException $exception) {
         return redirect()
             ->route('admin.dashboard', ['tab' => 'personal'])
@@ -480,21 +474,21 @@ private function actualizarEspecialidadTrabajador(Trabajador $trabajador): void
 
 public function eliminarTrabajador(Trabajador $trabajador): RedirectResponse
 {
-    $tieneCitas = $trabajador->citas()->exists() || $trabajador->detalles()->exists();
-
-    if ($tieneCitas) {
+    if ($this->trabajadorTieneCitasPendientes($trabajador)) {
         return redirect()
             ->route('admin.dashboard', ['tab' => 'personal'])
-            ->with('error', 'No se puede eliminar este trabajador porque tiene citas registradas. Desactívalo para que no aparezca en nuevas reservas y asegurate que no está siendo utilizado en ninguna reserva.');
+            ->with('error', 'No se puede eliminar este trabajador porque tiene citas pendientes o futuras registradas.');
     }
 
     try {
-        $foto = $trabajador->foto;
+        DB::transaction(function () use ($trabajador) {
+            $foto = $trabajador->foto;
 
-        $trabajador->servicios()->detach();
-        $trabajador->delete();
+            $trabajador->servicios()->detach();
+            $trabajador->delete();
 
-        $this->eliminarImagenPublica($foto, 'images/services/');
+            $this->eliminarImagenPublica($foto, 'images/services/');
+        });
 
         return redirect()
             ->route('admin.dashboard', ['tab' => 'personal'])
@@ -502,34 +496,60 @@ public function eliminarTrabajador(Trabajador $trabajador): RedirectResponse
     } catch (QueryException $exception) {
         return redirect()
             ->route('admin.dashboard', ['tab' => 'personal'])
-            ->with('error', 'No se pudo eliminar el trabajador porque está relacionado con otros registros. Puedes desactivarlo para ocultarlo de nuevas reservas.');
+            ->with('error', 'No se pudo eliminar el trabajador porque tiene registros protegidos.');
     }
 }
 public function eliminarSeccionPersonal(Servicio $servicio): RedirectResponse
 {
-    $tieneCitas = $servicio->citas()->exists() || $servicio->detalles()->exists();
-
-    if ($tieneCitas) {
+    if ($this->servicioTieneCitasPendientes($servicio)) {
         return redirect()
             ->route('admin.dashboard', ['tab' => 'personal'])
-            ->with('error', 'No se puede eliminar esta sección porque tiene servicios o citas registradas. Puedes desactivarla desde Gestión de servicios.');
+            ->with('error', 'No se puede eliminar esta sección porque tiene citas pendientes o futuras registradas. Puedes desactivarla desde Gestión de servicios.');
     }
 
     try {
-        $servicio->trabajadores()->detach();
+        DB::transaction(function () use ($servicio) {
+            $trabajadores = $servicio->trabajadores()->get();
 
-        $imagen = $servicio->imagen;
-        $servicio->delete();
+            foreach ($trabajadores as $trabajador) {
+                $trabajador->servicios()->detach($servicio->id_servicio);
 
-        $this->eliminarImagenPublica($imagen, 'images/services/');
+                $trabajador->load('servicios');
+
+                if ($trabajador->servicios->count() === 0) {
+                    if ($this->trabajadorTieneCitasPendientes($trabajador)) {
+                        $trabajador->update([
+                            'estado' => 'inactivo',
+                            'especialidad' => 'Sin sección asignada',
+                        ]);
+
+                        continue;
+                    }
+
+                    $foto = $trabajador->foto;
+                    $trabajador->delete();
+                    $this->eliminarImagenPublica($foto, 'images/services/');
+                } else {
+                    $this->actualizarEspecialidadTrabajador($trabajador);
+                }
+            }
+
+            $imagen = $servicio->imagen;
+
+            $this->eliminarRelacionesHistoricasServicio($servicio);
+
+            $servicio->delete();
+
+            $this->eliminarImagenPublica($imagen, 'images/services/');
+        });
 
         return redirect()
             ->route('admin.dashboard', ['tab' => 'personal'])
-            ->with('success', 'Sección eliminada correctamente.');
+            ->with('success', 'Sección eliminada correctamente. No existían citas pendientes asociadas.');
     } catch (QueryException $exception) {
         return redirect()
             ->route('admin.dashboard', ['tab' => 'personal'])
-            ->with('error', 'No se pudo eliminar la sección porque tiene registros asociados.');
+            ->with('error', 'No se pudo eliminar la sección porque todavía tiene registros protegidos.');
     }
 }
     public function actualizarAsistencia(Request $request, Cita $cita): RedirectResponse
@@ -845,7 +865,7 @@ private function eliminarImagenPublica(?string $archivo, string $carpetaRelativa
 
     private function agruparCitasPorTiempo(Collection $citas): Collection
     {
-        $hoy = Carbon::today();
+    $hoy = Carbon::today('America/Bogota');
 
         $inicioSemana = $hoy->copy()->startOfWeek(Carbon::MONDAY);
         $finSemana = $hoy->copy()->endOfWeek(Carbon::SUNDAY);
@@ -888,4 +908,59 @@ private function eliminarImagenPublica(?string $archivo, string $carpetaRelativa
             return 'Citas anteriores';
         });
     }
+    private function trabajadorTieneCitasPendientes(Trabajador $trabajador): bool
+{
+    $ahora = Carbon::now('America/Bogota');
+    $hoy = $ahora->format('Y-m-d');
+    $horaActual = $ahora->format('H:i:s');
+
+    return Cita::query()
+        ->where('id_trabajador', $trabajador->id_trabajador)
+        ->whereIn('estado', ['registrada', 'confirmada'])
+        ->where(function ($query) use ($hoy, $horaActual) {
+            $query->where('fecha_cita', '>', $hoy)
+                ->orWhere(function ($subQuery) use ($hoy, $horaActual) {
+                    $subQuery->where('fecha_cita', $hoy)
+                        ->where('hora_fin', '>=', $horaActual);
+                });
+        })
+        ->exists();
+}
+private function servicioTieneCitasPendientes(Servicio $servicio): bool
+{
+    $ahora = Carbon::now('America/Bogota');
+    $hoy = $ahora->format('Y-m-d');
+    $horaActual = $ahora->format('H:i:s');
+
+    return Cita::query()
+        ->whereIn('estado', ['registrada', 'confirmada'])
+        ->where(function ($query) use ($servicio) {
+            $query->whereHas('servicios', function ($servicioQuery) use ($servicio) {
+                $servicioQuery->where('servicios.id_servicio', $servicio->id_servicio);
+            })
+            ->orWhereHas('detalles', function ($detalleQuery) use ($servicio) {
+                $detalleQuery->where('id_servicio', $servicio->id_servicio);
+            });
+        })
+        ->where(function ($query) use ($hoy, $horaActual) {
+            $query->where('fecha_cita', '>', $hoy)
+                ->orWhere(function ($subQuery) use ($hoy, $horaActual) {
+                    $subQuery->where('fecha_cita', $hoy)
+                        ->where('hora_fin', '>=', $horaActual);
+                });
+        })
+        ->exists();
+}
+
+private function eliminarRelacionesHistoricasServicio(Servicio $servicio): void
+{
+    DB::table('cita_detalle')
+        ->where('id_servicio', $servicio->id_servicio)
+        ->delete();
+
+    DB::table('cita_servicio')
+        ->where('id_servicio', $servicio->id_servicio)
+        ->delete();
+}
+
 }
